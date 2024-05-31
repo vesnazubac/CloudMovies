@@ -1,0 +1,163 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "CloudBackMain.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "CloudBackMain.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "CloudBackMain": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "CloudBackMain.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/8bbc4e8bb6931839192e6ffe49830f8c88d49f40c483cbdbd2074aacf8e23b32.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "CloudBackMain.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "CloudBackMain.assets"
+      ],
+      "metadata": {
+        "/CloudBackMain/TabelaFilmova": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "TabelaFilmovaE7D6865B"
+            }
+          }
+        ],
+        "/CloudBackMain/TabelaFilmova/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TabelaFilmovaE7D6865B"
+          }
+        ],
+        "/CloudBackMain/LambdaRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaRole3A44B857"
+          }
+        ],
+        "/CloudBackMain/LambdaRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaRoleDefaultPolicy75625A82"
+          }
+        ],
+        "/CloudBackMain/getMovies/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "getMovies3D759CAF"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppAFC1867E"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppDeployment2E415F9B0cc02149e439893aff9f268554e3c5a8"
+          }
+        ],
+        "/CloudBackMain/MovieApp/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppDeploymentStageprod52780FC6"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppEndpoint97FE4C76"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppOPTIONS3F33837B"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/movies/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppmovies481C4E39"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/movies/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppmoviesOPTIONS0535009A"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/movies/GET/ApiPermission.CloudBackMainMovieApp138B3D03.GET..movies": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppmoviesGETApiPermissionCloudBackMainMovieApp138B3D03GETmoviesAC135D59"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/movies/GET/ApiPermission.Test.CloudBackMainMovieApp138B3D03.GET..movies": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppmoviesGETApiPermissionTestCloudBackMainMovieApp138B3D03GETmoviesD3CF8F4F"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/movies/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppmoviesGET9FE2B339"
+          }
+        ],
+        "/CloudBackMain/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/CloudBackMain/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/CloudBackMain/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/CloudBackMain/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "CloudBackMain"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}
