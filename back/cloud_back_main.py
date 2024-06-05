@@ -1,5 +1,6 @@
 from aws_cdk import (
     # Duration,
+    RemovalPolicy,
     Stack,
     aws_apigateway as apigateway,
     aws_lambda as _lambda,
@@ -12,6 +13,8 @@ from aws_cdk import (
     aws_s3 as s3
 )
 from constructs import Construct
+
+
 
 class CloudBackMain(Stack):
 
@@ -27,6 +30,13 @@ class CloudBackMain(Stack):
             partition_key={'name': 'id_filma', 'type': dynamodb.AttributeType.STRING},
             sort_key={'name': 'naslov', 'type': dynamodb.AttributeType.STRING},
         )
+
+          # Kreiranje S3 bucketa
+        bucket = s3.Bucket(self, "moviesbucket",
+                           removal_policy=RemovalPolicy.DESTROY,  # Za razvojno okruženje, uklonite za produkciju
+                           auto_delete_objects=True)  # Automatsko brisanje objekata prilikom brisanja bucketa
+
+
 
 
         lambda_role = iam.Role(
@@ -46,9 +56,18 @@ class CloudBackMain(Stack):
                     "dynamodb:GetItem",
                     "dynamodb:PutItem",
                     "dynamodb:UpdateItem",
-                    "dynamodb:DeleteItem"
+                    "dynamodb:DeleteItem",
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:*",
+                    "s3:PutObjectACL"
                 ],
-                resources=[table.table_arn]
+                # resources=[table.table_arn]
+                 resources=[
+                    table.table_arn,
+                    f"{bucket.bucket_arn}/*"
+                  # bucket.bucket_arn
+                ]
             )
         )
 
@@ -98,7 +117,8 @@ class CloudBackMain(Stack):
                 memory_size=128,
                 timeout=Duration.seconds(10),
                 environment={
-                    'TABLE_NAME': table.table_name
+                    'TABLE_NAME': table.table_name,
+                    'BUCKET_NAME': bucket.bucket_name
                 },
                 role=lambda_role
             )
@@ -110,6 +130,15 @@ class CloudBackMain(Stack):
             "getMovies.lambda_handler",  # handler
             "getMovies",  # include_dir
             "GET",  # method
+            []
+        )
+
+        post_movie_lambda_function = create_lambda_function(
+            "postMovies",  # id
+            "postMoviesFunction",  # name
+            "postMovies.lambda_handler",  # handler
+            "postMovies",  # include_dir
+            "POST",  # method
             []
         )
 
@@ -131,9 +160,31 @@ class CloudBackMain(Stack):
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
 
+        table.grant_write_data(post_movie_lambda_function)
+        bucket.add_to_resource_policy(iam.PolicyStatement(
+        effect=iam.Effect.ALLOW,
+        actions=["s3:PutObject"],
+        principals=[lambda_role],
+        resources=[bucket.bucket_arn + "/*"]
+    ))
+        bucket.grant_put(post_movie_lambda_function)
+        bucket.grant_write(post_movie_lambda_function)
+       
         get_movies_integration = apigateway.LambdaIntegration(get_movie_lambda_function) #integracija izmedju lambda fje i API gateway-a, sto znaci da API Gateway može pozivati Lambda funkciju kao odgovor na HTTP zahteve. 
 
+        post_movies_integration = apigateway.LambdaIntegration(post_movie_lambda_function)
         #Ova metoda kreira novi resurs movies. To znači da će URL za ovaj resurs biti /movies.
         #To znači da će se, kada API Gateway primi GET zahtev na /movies, pozvati get_movie_lambda_function.
         self.api.root.add_resource("movies").add_method("GET", get_movies_integration) #Ova metoda dodaje novi resurs pod nazivom movies na root nivou API-ja.
 
+        #self.api.root("movies").add_method("POST", post_movies_integration)
+           # Assume the movies resource already exists
+        # moviesResource = self.api.root.get_resource("movies")
+        # if moviesResource is None:
+        #     # If not exists, create it (remove this part if you are sure it exists)
+        #     moviesResource = self.api.root.add_resource("movies")
+
+        # # Add POST method to the existing movies resource
+        # moviesResource.add_method("POST", post_movies_integration)
+ 
+        self.api.root.add_resource("postMovies").add_method("POST", post_movies_integration)

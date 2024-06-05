@@ -5,7 +5,6 @@ def lambda_handler(event, context):
     #Ova funkcija je ulazna tačka za Lambda funkciju koja će biti pozvana kada API Gateway primi HTTP zahtev.
     # Kreiranje klijenta za pristup DynamoDB
     dynamodb = boto3.resource('dynamodb')
-    #ubaci s3
     
     # Ime tabele
     table_name = 'TabelaFilmova'
@@ -20,7 +19,7 @@ def lambda_handler(event, context):
         # Vraćanje odgovora sa podacima iz tabele
         return {
             'statusCode': 200,
-            'body': json.dumps(response['Items'])
+            'body': json.dumps(response['Items'] + ["=> Rezultati"])
         }
     except Exception as e:
         # Vraćanje greške ako dođe do problema

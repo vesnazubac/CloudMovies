@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/8bbc4e8bb6931839192e6ffe49830f8c88d49f40c483cbdbd2074aacf8e23b32.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/26ca2554a41656ccd3f8a7aae71422126d87da7cc817bd5c883837bc59d8b4ef.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -48,6 +48,36 @@
             "data": "TabelaFilmovaE7D6865B"
           }
         ],
+        "/CloudBackMain/moviesbucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "moviesbucket19ABDBBF"
+          }
+        ],
+        "/CloudBackMain/moviesbucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "moviesbucketPolicy4F820C00"
+          }
+        ],
+        "/CloudBackMain/moviesbucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "moviesbucketAutoDeleteObjectsCustomResource9E918934"
+          }
+        ],
+        "/CloudBackMain/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/CloudBackMain/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
         "/CloudBackMain/LambdaRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -66,6 +96,12 @@
             "data": "getMovies3D759CAF"
           }
         ],
+        "/CloudBackMain/postMovies/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "postMoviesCC7660DE"
+          }
+        ],
         "/CloudBackMain/MovieApp/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -75,7 +111,7 @@
         "/CloudBackMain/MovieApp/Deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "MovieAppDeployment2E415F9B0cc02149e439893aff9f268554e3c5a8"
+            "data": "MovieAppDeployment2E415F9B86148ca9df731d0f00034dec267c7ea8"
           }
         ],
         "/CloudBackMain/MovieApp/DeploymentStage.prod/Resource": [
@@ -124,6 +160,36 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "MovieAppmoviesGET9FE2B339"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/postMovies/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieApppostMovies9931A0CE"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/postMovies/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieApppostMoviesOPTIONSF36DB835"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/postMovies/POST/ApiPermission.CloudBackMainMovieApp138B3D03.POST..postMovies": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieApppostMoviesPOSTApiPermissionCloudBackMainMovieApp138B3D03POSTpostMovies905C891C"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/postMovies/POST/ApiPermission.Test.CloudBackMainMovieApp138B3D03.POST..postMovies": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieApppostMoviesPOSTApiPermissionTestCloudBackMainMovieApp138B3D03POSTpostMoviesFA9FB220"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/postMovies/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieApppostMoviesPOSTEBB381A8"
           }
         ],
         "/CloudBackMain/CDKMetadata/Default": [
