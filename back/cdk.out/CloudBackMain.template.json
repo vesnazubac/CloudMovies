@@ -509,7 +509,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "350458b3518e20f1c26ac517b9f5ae0205517de25d502eac9fdd9f8d7f112fc9.zip"
+     "S3Key": "bb6fe3991953eaad5a14bdc70cad85d34a66a5634546e6e3c78c04c1acc7d776.zip"
     },
     "Environment": {
      "Variables": {
@@ -539,7 +539,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "CloudBackMain/getMovieById/Resource",
-    "aws:asset:path": "asset.350458b3518e20f1c26ac517b9f5ae0205517de25d502eac9fdd9f8d7f112fc9",
+    "aws:asset:path": "asset.bb6fe3991953eaad5a14bdc70cad85d34a66a5634546e6e3c78c04c1acc7d776",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
