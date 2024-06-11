@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/42de25e3d655eda30412e1d876df89e3a34cef1e903ac5103a20e5e99714277e.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/5f4f138ee9fcd1ec32c04c3fc47f9c95e18503822aa9696a70f496b6983734a2.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -102,6 +102,12 @@
             "data": "postMoviesCC7660DE"
           }
         ],
+        "/CloudBackMain/getMovieById/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "getMovieById51E1AC5F"
+          }
+        ],
         "/CloudBackMain/MovieApp/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -111,7 +117,7 @@
         "/CloudBackMain/MovieApp/Deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "MovieAppDeployment2E415F9B86148ca9df731d0f00034dec267c7ea8"
+            "data": "MovieAppDeployment2E415F9B89777eb6ff5949de77aae1ad27842dda"
           }
         ],
         "/CloudBackMain/MovieApp/DeploymentStage.prod/Resource": [
@@ -190,6 +196,36 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "MovieApppostMoviesPOSTEBB381A8"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/getMovie/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppgetMovieC9596192"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/getMovie/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppgetMovieOPTIONS821B8304"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/getMovie/GET/ApiPermission.CloudBackMainMovieApp138B3D03.GET..getMovie": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppgetMovieGETApiPermissionCloudBackMainMovieApp138B3D03GETgetMovieBE26108F"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/getMovie/GET/ApiPermission.Test.CloudBackMainMovieApp138B3D03.GET..getMovie": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppgetMovieGETApiPermissionTestCloudBackMainMovieApp138B3D03GETgetMovie6FA18E62"
+          }
+        ],
+        "/CloudBackMain/MovieApp/Default/getMovie/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MovieAppgetMovieGETB61DB035"
           }
         ],
         "/CloudBackMain/CDKMetadata/Default": [

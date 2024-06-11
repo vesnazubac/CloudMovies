@@ -121,6 +121,8 @@ class CloudBackMain(Stack):
                     'BUCKET_NAME': bucket.bucket_name
                 },
                 role=lambda_role
+                
+                
             )
             return function
 
@@ -142,8 +144,19 @@ class CloudBackMain(Stack):
             []
         )
 
+        get_movie_by_id_lambda_function = create_lambda_function(
+            "getMovieById",  # id
+            "getMovieByIdFunction",  # name
+            "getMovieById.lambda_handler",  # handler
+            "getMovieById",  # include_dir
+            "GET",  # method
+            []  # layers
+        )
+
+     
 
 
+         
 
 
         self.api = apigateway.RestApi(self, "MovieApp",
@@ -169,10 +182,12 @@ class CloudBackMain(Stack):
     ))
         bucket.grant_put(post_movie_lambda_function)
         bucket.grant_write(post_movie_lambda_function)
+        bucket.grant_read(get_movie_by_id_lambda_function)
        
         get_movies_integration = apigateway.LambdaIntegration(get_movie_lambda_function) #integracija izmedju lambda fje i API gateway-a, sto znaci da API Gateway može pozivati Lambda funkciju kao odgovor na HTTP zahteve. 
 
         post_movies_integration = apigateway.LambdaIntegration(post_movie_lambda_function)
+        get_movie_by_id_integration = apigateway.LambdaIntegration(get_movie_by_id_lambda_function)
         #Ova metoda kreira novi resurs movies. To znači da će URL za ovaj resurs biti /movies.
         #To znači da će se, kada API Gateway primi GET zahtev na /movies, pozvati get_movie_lambda_function.
         self.api.root.add_resource("movies").add_method("GET", get_movies_integration) #Ova metoda dodaje novi resurs pod nazivom movies na root nivou API-ja.
@@ -188,3 +203,7 @@ class CloudBackMain(Stack):
         # moviesResource.add_method("POST", post_movies_integration)
  
         self.api.root.add_resource("postMovies").add_method("POST", post_movies_integration)
+
+
+        self.api.root.add_resource("getMovie").add_method("GET", get_movie_by_id_integration)
+      

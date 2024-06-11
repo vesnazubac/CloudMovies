@@ -40,7 +40,20 @@
         }
       }
     },
-    "42de25e3d655eda30412e1d876df89e3a34cef1e903ac5103a20e5e99714277e": {
+    "350458b3518e20f1c26ac517b9f5ae0205517de25d502eac9fdd9f8d7f112fc9": {
+      "source": {
+        "path": "asset.350458b3518e20f1c26ac517b9f5ae0205517de25d502eac9fdd9f8d7f112fc9",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "350458b3518e20f1c26ac517b9f5ae0205517de25d502eac9fdd9f8d7f112fc9.zip",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "5f4f138ee9fcd1ec32c04c3fc47f9c95e18503822aa9696a70f496b6983734a2": {
       "source": {
         "path": "CloudBackMain.template.json",
         "packaging": "file"
@@ -48,7 +61,7 @@
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "42de25e3d655eda30412e1d876df89e3a34cef1e903ac5103a20e5e99714277e.json",
+          "objectKey": "5f4f138ee9fcd1ec32c04c3fc47f9c95e18503822aa9696a70f496b6983734a2.json",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }

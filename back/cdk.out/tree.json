@@ -416,6 +416,9 @@
                               "Action": [
                                 "s3:Abort*",
                                 "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:GetObject*",
+                                "s3:List*",
                                 "s3:PutObject",
                                 "s3:PutObjectLegalHold",
                                 "s3:PutObjectRetention",
@@ -626,6 +629,82 @@
               "version": "2.143.0"
             }
           },
+          "getMovieById": {
+            "id": "getMovieById",
+            "path": "CloudBackMain/getMovieById",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "CloudBackMain/getMovieById/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "CloudBackMain/getMovieById/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.143.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "CloudBackMain/getMovieById/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.143.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.143.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CloudBackMain/getMovieById/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                      },
+                      "s3Key": "350458b3518e20f1c26ac517b9f5ae0205517de25d502eac9fdd9f8d7f112fc9.zip"
+                    },
+                    "environment": {
+                      "variables": {
+                        "TABLE_NAME": {
+                          "Ref": "TabelaFilmovaE7D6865B"
+                        },
+                        "BUCKET_NAME": {
+                          "Ref": "moviesbucket19ABDBBF"
+                        }
+                      }
+                    },
+                    "functionName": "getMovieByIdFunction",
+                    "handler": "getMovieById.lambda_handler",
+                    "memorySize": 128,
+                    "role": {
+                      "Fn::GetAtt": [
+                        "LambdaRole3A44B857",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "python3.9",
+                    "timeout": 10
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.143.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.143.0"
+            }
+          },
           "MovieApp": {
             "id": "MovieApp",
             "path": "CloudBackMain/MovieApp",
@@ -688,7 +767,7 @@
                       "aws:cdk:cloudformation:type": "AWS::ApiGateway::Stage",
                       "aws:cdk:cloudformation:props": {
                         "deploymentId": {
-                          "Ref": "MovieAppDeployment2E415F9B86148ca9df731d0f00034dec267c7ea8"
+                          "Ref": "MovieAppDeployment2E415F9B89777eb6ff5949de77aae1ad27842dda"
                         },
                         "restApiId": {
                           "Ref": "MovieAppAFC1867E"
@@ -1243,6 +1322,249 @@
                                 },
                                 "resourceId": {
                                   "Ref": "MovieApppostMovies9931A0CE"
+                                },
+                                "restApiId": {
+                                  "Ref": "MovieAppAFC1867E"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                              "version": "2.143.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                          "version": "2.143.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigateway.Resource",
+                      "version": "2.143.0"
+                    }
+                  },
+                  "getMovie": {
+                    "id": "getMovie",
+                    "path": "CloudBackMain/MovieApp/Default/getMovie",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "CloudBackMain/MovieApp/Default/getMovie/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Resource",
+                          "aws:cdk:cloudformation:props": {
+                            "parentId": {
+                              "Fn::GetAtt": [
+                                "MovieAppAFC1867E",
+                                "RootResourceId"
+                              ]
+                            },
+                            "pathPart": "getMovie",
+                            "restApiId": {
+                              "Ref": "MovieAppAFC1867E"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.CfnResource",
+                          "version": "2.143.0"
+                        }
+                      },
+                      "OPTIONS": {
+                        "id": "OPTIONS",
+                        "path": "CloudBackMain/MovieApp/Default/getMovie/OPTIONS",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "CloudBackMain/MovieApp/Default/getMovie/OPTIONS/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                              "aws:cdk:cloudformation:props": {
+                                "apiKeyRequired": false,
+                                "authorizationType": "NONE",
+                                "httpMethod": "OPTIONS",
+                                "integration": {
+                                  "type": "MOCK",
+                                  "requestTemplates": {
+                                    "application/json": "{ statusCode: 200 }"
+                                  },
+                                  "integrationResponses": [
+                                    {
+                                      "statusCode": "204",
+                                      "responseParameters": {
+                                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+                                      }
+                                    }
+                                  ]
+                                },
+                                "methodResponses": [
+                                  {
+                                    "statusCode": "204",
+                                    "responseParameters": {
+                                      "method.response.header.Access-Control-Allow-Headers": true,
+                                      "method.response.header.Access-Control-Allow-Origin": true,
+                                      "method.response.header.Access-Control-Allow-Methods": true
+                                    }
+                                  }
+                                ],
+                                "resourceId": {
+                                  "Ref": "MovieAppgetMovieC9596192"
+                                },
+                                "restApiId": {
+                                  "Ref": "MovieAppAFC1867E"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                              "version": "2.143.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                          "version": "2.143.0"
+                        }
+                      },
+                      "GET": {
+                        "id": "GET",
+                        "path": "CloudBackMain/MovieApp/Default/getMovie/GET",
+                        "children": {
+                          "ApiPermission.CloudBackMainMovieApp138B3D03.GET..getMovie": {
+                            "id": "ApiPermission.CloudBackMainMovieApp138B3D03.GET..getMovie",
+                            "path": "CloudBackMain/MovieApp/Default/getMovie/GET/ApiPermission.CloudBackMainMovieApp138B3D03.GET..getMovie",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                              "aws:cdk:cloudformation:props": {
+                                "action": "lambda:InvokeFunction",
+                                "functionName": {
+                                  "Fn::GetAtt": [
+                                    "getMovieById51E1AC5F",
+                                    "Arn"
+                                  ]
+                                },
+                                "principal": "apigateway.amazonaws.com",
+                                "sourceArn": {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      "arn:",
+                                      {
+                                        "Ref": "AWS::Partition"
+                                      },
+                                      ":execute-api:",
+                                      {
+                                        "Ref": "AWS::Region"
+                                      },
+                                      ":",
+                                      {
+                                        "Ref": "AWS::AccountId"
+                                      },
+                                      ":",
+                                      {
+                                        "Ref": "MovieAppAFC1867E"
+                                      },
+                                      "/",
+                                      {
+                                        "Ref": "MovieAppDeploymentStageprod52780FC6"
+                                      },
+                                      "/GET/getMovie"
+                                    ]
+                                  ]
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                              "version": "2.143.0"
+                            }
+                          },
+                          "ApiPermission.Test.CloudBackMainMovieApp138B3D03.GET..getMovie": {
+                            "id": "ApiPermission.Test.CloudBackMainMovieApp138B3D03.GET..getMovie",
+                            "path": "CloudBackMain/MovieApp/Default/getMovie/GET/ApiPermission.Test.CloudBackMainMovieApp138B3D03.GET..getMovie",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                              "aws:cdk:cloudformation:props": {
+                                "action": "lambda:InvokeFunction",
+                                "functionName": {
+                                  "Fn::GetAtt": [
+                                    "getMovieById51E1AC5F",
+                                    "Arn"
+                                  ]
+                                },
+                                "principal": "apigateway.amazonaws.com",
+                                "sourceArn": {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      "arn:",
+                                      {
+                                        "Ref": "AWS::Partition"
+                                      },
+                                      ":execute-api:",
+                                      {
+                                        "Ref": "AWS::Region"
+                                      },
+                                      ":",
+                                      {
+                                        "Ref": "AWS::AccountId"
+                                      },
+                                      ":",
+                                      {
+                                        "Ref": "MovieAppAFC1867E"
+                                      },
+                                      "/test-invoke-stage/GET/getMovie"
+                                    ]
+                                  ]
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                              "version": "2.143.0"
+                            }
+                          },
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "CloudBackMain/MovieApp/Default/getMovie/GET/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                              "aws:cdk:cloudformation:props": {
+                                "authorizationType": "NONE",
+                                "httpMethod": "GET",
+                                "integration": {
+                                  "type": "AWS_PROXY",
+                                  "uri": {
+                                    "Fn::Join": [
+                                      "",
+                                      [
+                                        "arn:",
+                                        {
+                                          "Ref": "AWS::Partition"
+                                        },
+                                        ":apigateway:",
+                                        {
+                                          "Ref": "AWS::Region"
+                                        },
+                                        ":lambda:path/2015-03-31/functions/",
+                                        {
+                                          "Fn::GetAtt": [
+                                            "getMovieById51E1AC5F",
+                                            "Arn"
+                                          ]
+                                        },
+                                        "/invocations"
+                                      ]
+                                    ]
+                                  },
+                                  "integrationHttpMethod": "POST"
+                                },
+                                "resourceId": {
+                                  "Ref": "MovieAppgetMovieC9596192"
                                 },
                                 "restApiId": {
                                   "Ref": "MovieAppAFC1867E"
