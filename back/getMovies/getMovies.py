@@ -20,11 +20,20 @@ def lambda_handler(event, context):
         # Vraćanje odgovora sa podacima iz tabele
         return {
             'statusCode': 200,
-            'body': json.dumps(response['Items'])
+            'body': json.dumps(response['Items']),
+              'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods':"GET,OPTIONS"
+            }
         }
     except Exception as e:
         # Vraćanje greške ako dođe do problema
         return {
             'statusCode': 500,
-            'body': json.dumps(str(e))
+            'body': json.dumps(str(e)),
+              'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True
+            }
         }
