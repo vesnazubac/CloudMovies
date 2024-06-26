@@ -24,11 +24,15 @@ class CloudBackMain(Stack):
 
     #pravimo dinamo bazu
 
-        table=dynamodb.Table(
-            self,'TabelaFilmova',
-            table_name='TabelaFilmova',
-            partition_key={'name': 'id_filma', 'type': dynamodb.AttributeType.STRING},
-            sort_key={'name': 'naslov', 'type': dynamodb.AttributeType.STRING},
+        # table=dynamodb.Table(
+        #     self,'TabelaFilmova',
+        #     table_name='TabelaFilmova',
+        #     partition_key={'name': 'id_filma', 'type': dynamodb.AttributeType.STRING},
+        #     sort_key={'name': 'naslov', 'type': dynamodb.AttributeType.STRING},
+        # )
+        table= dynamodb.Table.from_table_name(
+            self, 'TabelaFilmova',
+            table_name='TabelaFilmova'  # Ime postojeće DynamoDB tabele
         )
 
           # Kreiranje S3 bucketa
@@ -165,7 +169,8 @@ class CloudBackMain(Stack):
                                     endpoint_types=[apigateway.EndpointType.REGIONAL], #API ce biti dostupan regionalno a ne globalno ili privatno
                                     default_cors_preflight_options={
                                         "allow_origins": apigateway.Cors.ALL_ORIGINS,
-                                        "allow_methods": apigateway.Cors.ALL_METHODS
+                                        "allow_methods": apigateway.Cors.ALL_METHODS,
+                                      
                                     }
                                     )
 
