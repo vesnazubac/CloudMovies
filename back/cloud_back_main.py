@@ -10,7 +10,9 @@ from aws_cdk import (
     aws_dynamodb as dynamodb,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as tasks,
-    aws_s3 as s3
+    aws_s3 as s3,
+    aws_cognito as cognito
+
 )
 from constructs import Construct
 
@@ -41,6 +43,27 @@ class CloudBackMain(Stack):
                            auto_delete_objects=True)  # Automatsko brisanje objekata prilikom brisanja bucketa
 
 
+        
+        user_pool = cognito.UserPool(
+            self, "UserPoolMovie",
+            user_pool_name="MovieAppUserPool",
+            self_sign_up_enabled=True,  # Omogućava korisnicima da se sami registruju
+            auto_verify=cognito.AutoVerifiedAttrs(email=True),  # Automatska verifikacija email-a
+            password_policy=cognito.PasswordPolicy(
+                min_length=8,
+                require_digits=True,
+                require_lowercase=True,
+                require_uppercase=True,
+                require_symbols=False
+                
+            ),
+            sign_in_aliases=cognito.SignInAliases(email=True),
+            account_recovery=cognito.AccountRecovery.EMAIL_ONLY,
+            standard_attributes=cognito.StandardAttributes(
+                email=cognito.StandardAttribute(required=True)
+            )
+        )
+
 
 
         lambda_role = iam.Role(
@@ -64,50 +87,30 @@ class CloudBackMain(Stack):
                     "s3:PutObject",
                     "s3:GetObject",
                     "s3:*",
-                    "s3:PutObjectACL"
+                    "s3:PutObjectACL",
+                    "cognito-idp:AdminCreateUser",
+                    "cognito-idp:AdminInitiateAuth",
+                    "cognito-idp:AdminRespondToAuthChallenge"
                 ],
                 # resources=[table.table_arn]
                  resources=[
                     table.table_arn,
-                    f"{bucket.bucket_arn}/*"
+                    f"{bucket.bucket_arn}/*",
+                    user_pool.user_pool_arn
+                   
+                    
+                    
                   # bucket.bucket_arn
                 ]
             )
         )
 
-        # def create_lambda_function(id,name, handler, include_dir, method, layers):
-        #     function = _lambda.Function(
-        #         self, id,
-        #         function_name=name,
-        #         runtime=_lambda.Runtime.PYTHON_3_9,
-        #         layers=layers,
-        #         handler=handler,
-        #         code=_lambda.Code.from_asset(include_dir,
-        #                                      # bundling=BundlingOptions(
-        #                                      #     image=_lambda.Runtime.PYTHON_3_9.bundling_image,
-        #                                      #     command=[
-        #                                      #          "cmd.exe", "/c",  # Koristimo cmd.exe za pokretanje komandi na Windows-u
-        #                                      # "pip install --no-cache -r requirements.txt -t . && copy .\\* ..\\asset-output"
-        #                                      #     ],
-        #                                      # ),
-        #                                      ),
-        #         memory_size=128,
-        #         timeout=Duration.seconds(10),
-        #         environment={
-        #             'TABLE_NAME': table.table_name
-        #         },
-        #         role=lambda_role
-        #     )
+     
 
-        
-        # get_movie_lambda_function = create_lambda_function(
-        #     "getMovies", #id - jedinstveni identifikator za lambda fju u okviru CDK stacka. Koristi se interno od strane CDK za identifikaciju resursa
-        #     "getMoviesFuction", #name - ime lambda funkcije koje ce biti prikazano na aws konzoli, koristimo ga za identifikaciju fje unutar AWS naloga
-        #     "getMovies.lambda_handler", #handler - specificira handler za Lambda fju odnosno ulaznu tacku funkcije. getMovies je naziv fajla a lambda_handler je naziv fje unutar tog fajla koja ce biti pozvana kada se Lambda fja
-        #     "getMovies", #dir - Ovaj argument specificira direktorijum u kojem se nalazi kod Lambda funkcije. getMovies je ime direktorijuma koji sadrži sve potrebne fajlove za ovu Lambda funkciju.
-        #     "GET", #method - vaj argument definiše HTTP metodu koju će Lambda funkcija koristiti u kontekstu integracije sa API Gateway-om. U ovom slučaju, to je GET metoda
-        #     []
-        # )
+
+
+
+           
 
 
         def create_lambda_function(id, name, handler, include_dir, method, layers):
@@ -122,7 +125,8 @@ class CloudBackMain(Stack):
                 timeout=Duration.seconds(10),
                 environment={
                     'TABLE_NAME': table.table_name,
-                    'BUCKET_NAME': bucket.bucket_name
+                    'BUCKET_NAME': bucket.bucket_name,
+                    'USER_POOL_ID':user_pool.user_pool_id
                 },
                 role=lambda_role
                 
@@ -173,8 +177,22 @@ class CloudBackMain(Stack):
                                       
                                     }
                                     )
+     
+        register_user_lambda_function = create_lambda_function(
+            "RegisterUser",  # id
+            "RegisterUserFunction",  # name
+            "registerUser.lambda_handler",  # handler
+            "registerUser",  # include_dir
+            "POST",  # method (pretpostavljamo da se koristi POST za registraciju)
+            []
+        )
 
+        # # Dodavanje dozvola Lambda funkciji da poziva Cognito User Pool
+        # user_pool.grant_sign_up(register_user_lambda_function)
+        # user_pool.grant_read_attributes(register_user_lambda_function)
+        # user_pool.grant_read_write_attributes(register_user_lambda_function)
 
+        
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
 
@@ -188,6 +206,10 @@ class CloudBackMain(Stack):
         bucket.grant_put(post_movie_lambda_function)
         bucket.grant_write(post_movie_lambda_function)
         bucket.grant_read(get_movie_by_id_lambda_function)
+
+        register_user_integration = apigateway.LambdaIntegration(register_user_lambda_function)
+        self.api.root.add_resource("registerUser").add_method("POST", register_user_integration)
+
        
         get_movies_integration = apigateway.LambdaIntegration(get_movie_lambda_function) #integracija izmedju lambda fje i API gateway-a, sto znaci da API Gateway može pozivati Lambda funkciju kao odgovor na HTTP zahteve. 
 
