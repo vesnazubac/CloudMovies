@@ -11,8 +11,8 @@ def lambda_handler(event, context):
         username = body['username']
         password = body['password']
         email = body['email']
-        name = body['name']
-        surname = body['surname']
+        name = body['firstName']
+        surname = body['lastName']
         birthdate = body['birthdate']
         
 
@@ -35,11 +35,27 @@ def lambda_handler(event, context):
         # Return uspeha
         return {
             'statusCode': 200,
-            'body': json.dumps('User registered successfully')
+            'body': json.dumps('User registered successfully'),
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods':"POST,OPTIONS"}
         }
     except Exception as e:
         # Return greške
+        # return {
+        #     'statusCode': 400,
+        #     'body': json.dumps(str(e))
+        # }
+     # Return greške
+        error_message = f"Error registering user: {str(e)}"
+        print(error_message)  # Ovde dodajemo ispis greške u CloudWatch logs
         return {
             'statusCode': 400,
-            'body': json.dumps(str(e))
+            'body': json.dumps(error_message),
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods': "POST,OPTIONS"
+            }
         }
