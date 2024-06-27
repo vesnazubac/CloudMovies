@@ -65,6 +65,8 @@ class CloudBackMain(Stack):
         )
 
 
+           
+
 
         lambda_role = iam.Role(
             self, "LambdaRole",
@@ -90,7 +92,11 @@ class CloudBackMain(Stack):
                     "s3:PutObjectACL",
                     "cognito-idp:AdminCreateUser",
                     "cognito-idp:AdminInitiateAuth",
-                    "cognito-idp:AdminRespondToAuthChallenge"
+                    "cognito-idp:AdminRespondToAuthChallenge",
+                    "cognito-idp:InitiateAuth",  # Dozvola za inicijaciju autentifikacije
+                     "cognito-idp:RespondToAuthChallenge",  # Dozvola za odgovaranje na autentifikacioni izazov
+                    "cognito-idp:AdminGetUser",  # Dozvola za dobijanje podataka o korisniku preko Admin API-ja
+                    "cognito-idp:GlobalSignOut"  # Dozvola za globalan odjavljivanje korisnika
                 ],
                 # resources=[table.table_arn]
                  resources=[
@@ -126,7 +132,8 @@ class CloudBackMain(Stack):
                 environment={
                     'TABLE_NAME': table.table_name,
                     'BUCKET_NAME': bucket.bucket_name,
-                    'USER_POOL_ID':user_pool.user_pool_id
+                    'USER_POOL_ID':user_pool.user_pool_id,
+                    
                 },
                 role=lambda_role
                 
@@ -142,6 +149,16 @@ class CloudBackMain(Stack):
             "GET",  # method
             []
         )
+
+        login_user_lambda_function = create_lambda_function(
+    "LoginUser",  # id
+    "LoginUserFunction",  # name
+    "loginUser.lambda_handler",  # handler
+    "loginUser",  # include_dir
+    "POST",  # method (pretpostavljamo da se koristi POST za login)
+    []
+)
+
 
         post_movie_lambda_function = create_lambda_function(
             "postMovies",  # id
@@ -203,12 +220,18 @@ class CloudBackMain(Stack):
         principals=[lambda_role],
         resources=[bucket.bucket_arn + "/*"]
     ))
+        
+        #user_pool.grant_invoke(login_user_lambda_function)
+
         bucket.grant_put(post_movie_lambda_function)
         bucket.grant_write(post_movie_lambda_function)
         bucket.grant_read(get_movie_by_id_lambda_function)
 
         register_user_integration = apigateway.LambdaIntegration(register_user_lambda_function)
         self.api.root.add_resource("registerUser").add_method("POST", register_user_integration)
+
+        login_user_integration = apigateway.LambdaIntegration(login_user_lambda_function)
+        self.api.root.add_resource("loginUser").add_method("POST", login_user_integration)
 
        
         get_movies_integration = apigateway.LambdaIntegration(get_movie_lambda_function) #integracija izmedju lambda fje i API gateway-a, sto znaci da API Gateway može pozivati Lambda funkciju kao odgovor na HTTP zahteve. 
