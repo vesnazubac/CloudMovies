@@ -1,144 +1,132 @@
-import { Component } from '@angular/core';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatButtonModule} from '@angular/material/button';
+import { Component, ViewChild, ElementRef } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
-import { ViewChild, ElementRef } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Login } from 'src/app/auth/model/login.model';
 import { AuthService } from 'src/app/auth/auth.service';
-import { AuthResponse } from 'src/app/auth/model/auth-resposne.model';
+import { environment } from 'src/env/env';
+import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { SocketApiService } from 'src/app/models/socketApiService.service';
-import { Subscription } from 'rxjs';
+
 @Component({
   selector: 'app-login-form',
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.css'],
-  standalone:true,
-  imports:[MatFormFieldModule, MatInputModule, MatIconModule,MatButtonModule,MatIconModule,ReactiveFormsModule,
-  MatSnackBarModule]
-  
+  standalone: true,
+  imports: [MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule,ReactiveFormsModule]
 })
-
 export class LoginFormComponent {
-
-  private stompSubscription: Subscription;
-
-  constructor(private authService: AuthService,
-    private router: Router,private snackBar: MatSnackBar,private socketApiService:SocketApiService) {}
-
-  hide=true;
+   hide:boolean=true;
   @ViewChild('usernameInput') usernameInput!: ElementRef;
   @ViewChild('passwordInput') passwordInput!: ElementRef;
 
   loginForm = new FormGroup({
     username: new FormControl(),
     password: new FormControl()
-  })
-  
-  navigateToHome() {
+  });
 
-    const username = this.usernameInput.nativeElement.value;
-    const password = this.passwordInput.nativeElement.value;
+  private userPoolData = {
+    UserPoolId: environment.userPoolId,
+    ClientId: environment.userPoolClientId
+  };
 
-    console.log('Username:', username);
-    console.log('Password:', password);
-    // ...
-    this.router.navigate(['home']);
+  private userPool = new CognitoUserPool(this.userPoolData);
 
-    
-  }
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   login(): void {
-    console.log("USAOOOO LOGGGG VESNA")
-    if(this.loginForm.valid) {
-      const login: Login = {
-        username: this.loginForm.value.username || "",
-        password: this.loginForm.value.password || ""
-      }
-      //console.log("USAOOOO LOGGGG VESNICCAAAAAAA 57")
-      this.authService.login(login).subscribe({
-        next: (response: AuthResponse) => {
-          localStorage.setItem('user', response.jwt);
-          this.authService.setUser()
-          //this.socketApiService.sendUserIdOnLogin( this.loginForm.value.username);
-          // this.socketApiService.getStompClient().subscribe("/socket-publisher/" + this.loginForm.value.username).subscribe((message: any) => {
-          //   // Ovde rukujete pristiglim porukama
-          //   console.log("Primljena poruka:", message);
-          // });
-          // this.stompSubscription = this.socketApiService.getStompClient().subscribe((stompClient) => {
-          //   if (stompClient) {
-          //     stompClient.subscribe("/socket-publisher/" + this.loginForm.value.username).subscribe((message: any) => {
-          //       // Handle incoming messages here
-          //       console.log("Received message:", message);
-          //     });
-          //   }
-          // });
+    if (this.loginForm.valid) {
+      const username = this.usernameInput.nativeElement.value;
+      const password = this.passwordInput.nativeElement.value;
 
-          // this.socketApiService.getStompClient().subscribe((stompClient) => {
-          //   if (stompClient) {
-          //     stompClient.subscribe("/socket-publisher/" + this.loginForm.value.username, (message: any) => {
-          //       // Handle incoming messages here
-          //       console.log("Received message:", message);
-          //     });
-          //   }
-          // });
-        //   this.stompSubscription = this.socketApiService.getStompClient().subscribe((stompClient)=> {
-        //     console.log("USAO OVDE KAO")
-        //     if (stompClient) {
-             
-        //         this.stompSubscription = stompClient.subscribe("/socket-publisher/" + this.loginForm.value.username, (message: any) => {
-        //             // Handle incoming messages here
-        //             console.log("Received message:", message);
-        //         });
-        //     }
-        // });
-        // console.log("Before if block");
+      const authenticationData = {
+        Username: username,
+        Password: password
+      };
 
-        // this.stompSubscription = this.socketApiService.getStompClient().subscribe((stompClient) => {
-        //   console.log("USAO OVDE KAO")
-    
-        //       this.stompSubscription = stompClient.subscribe("/socket-publisher/" + this.loginForm.value.username, (message: any) => {
-        //         console.log("Received message:", message);
-        //       });
+      const authenticationDetails = new AuthenticationDetails(authenticationData);
+
+      const userData = {
+        Username: authenticationData.Username,
+        Pool: this.userPool
+      };
+
+      const cognitoUser = new CognitoUser(userData);
+
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: (result) => {
           
-        // });
-        // console.log("USAO 112")
-        // const stompClient = this.socketApiService.getStompClient();
-        // const username :String=this.loginForm.value.username
-        // console.log(stompClient)
-        // stompClient.subscribe((stompClient) => {
-        //     console.log("EH")
-        //       //stompClient.subscribe("/socket-publisher/" + this.loginForm.value.username , (message: any) => {
-        //         // Handle incoming messages here
-        //         this.socketApiService.openGlobalSocket()
-        //        // console.log("Received message:", message);
-        //       });
-            
-       
+          console.log('Login successful:', result);
+          this.router.navigate(['/home']);
+          // Uzimanje tokena pristupa iz localStorage-a
+const accessToken = localStorage.getItem('CognitoIdentityServiceProvider.2amer6cbjphp31o6vpkcs469up.a3743812-d031-7047-b085-bee35a0e2046.accessToken');
 
-       //this.socketApiService.setUsername(this.loginForm.value.username)
-        this.socketApiService.openSocket(this.loginForm.value.username);
-     
-          this.router.navigate(['home'])
+// Parsiranje JWT tokena pristupa da biste dobili informacije
+const tokenParts = accessToken?.split('.');
+const encodedPayload = tokenParts ? tokenParts[1] : '';
+const decodedPayload = atob(encodedPayload);
+const tokenPayload = JSON.parse(decodedPayload);
+
+// Dobijanje korisničkog imena iz payload-a
+//const username = tokenPayload.sub;
+
+// console.log('Username:', username);
+const username=this.getUsernameFromSub(tokenPayload.sub)
+
         },
-        error:()=>{
-
-          console.error('Failed to login ');
-          this.snackBar.open('Failed login. Please check the username and password', 'Close', {
-            duration: 5000, 
-          });
-        }
-      })
+        onFailure: (err) => {
+          console.error('Login failed:', err);
+        },
+      });
     }
   }
 
-
-  register(){
-    this.router.navigate(['register'])
+  register() {
+    this.router.navigate(['register']);
   }
+
+  
+// Konfiguracija za vaš User Pool
+
+
+// Funkcija za dobijanje korisničkog imena na osnovu sub identifikatora
+ 
+ 
+// Funkcija za dobijanje korisničkog imena na osnovu sub identifikatora
+  getUsernameFromSub(sub: string) {
+   const  poolData1 = {
+      UserPoolId: environment.userPoolId, // Zamijenite 'your-user-pool-id' sa ID-om vašeg User Pool-a
+      ClientId: environment.userPoolClientId       // Zamijenite 'your-client-id' sa ID-om vašeg Cognito Client-a
+    };
+    
+    const userPool1 = new CognitoUserPool(poolData1);
+    const userData = {
+      Username: sub, // Sub identifikator korisnika za koga želite da dobijete informacije
+      Pool: this.userPool
+  };
+
+  const cognitoUser = new CognitoUser(userData); // Ispravno kreiranje CognitoUser objekta
+  if (cognitoUser.getSignInUserSession() !== null)
+  cognitoUser.getUserAttributes((err, attributes) => {
+      if (err) {
+          console.error('Error fetching user attributes:', err);
+          return;
+      }
+      if (attributes)
+      // Traženje korisničkog imena (username)
+      for (let attribute of attributes) {
+          if (attribute.getName() === 'sub') {
+              console.log('Username:', attribute.getValue());
+              break;
+          }
+      }
+  });
 }
+ }
+
