@@ -1,0 +1,57 @@
+<h2 class="header1" style="text-align: center;">Accommodations that match your search:</h2>
+<div class="card-container">
+    <div *ngFor="let accommodation of filteredAccommodations" style="margin-bottom: 2%;margin-top: 1%;">
+      <mat-card class="custom-card">
+        <mat-card-content>
+          <h2>{{accommodation.accommodation.name}}</h2>
+          <p>{{accommodation.accommodation.location.country}}, {{accommodation.accommodation.location.city}}</p>
+          <div *ngIf="accommodation.accommodation && accommodation.accommodation.images && accommodation.accommodation.images.length > 0; else noImages">
+            <img [src]="accommodation?.accommodation?.images?.[0]" alt="{{ accommodation?.accommodation?.name }} Image" style="width: 400px; height: 200px;">
+          </div>
+          <ng-template #noImages>
+            <!-- Show a default image if there are no images -->
+            <img src="../../../assets/images/accommodation1.jpg" alt="Default Image" style="width: 400px; height: 200px;">
+          </ng-template>
+          <br>
+          <p>Total price:{{accommodation.totalPrice}}</p>
+          <p>Unit price:{{accommodation.unitPrice}}</p>
+          <p>Average rating:{{accommodation.averageRating}}</p>
+          <button (click)="showDetails(accommodation)">Show details</button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    
+  </div>
+  <h2 style="text-align: center;">Filter by:</h2>
+  <h3 style="text-align: center;">Accommodation type : </h3>
+      
+    <form [formGroup]="filterAccommodationForm" style="text-align: center;">
+      <div class="type-container">
+        <mat-radio-group aria-label="Select an option" formControlName="type">
+          <mat-radio-button id="roomBtn" [value]="accommodationTypeEnum.ROOM">ROOM</mat-radio-button>
+          <mat-radio-button id="apartmentBtn" [value]="accommodationTypeEnum.APARTMENT">APARTMENT</mat-radio-button>
+          <mat-radio-button id="vipRoomBtn" [value]="accommodationTypeEnum.VIP_ROOM">VIP_ROOM</mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <div class="options-container">
+        <mat-chip-listbox aria-label="Accommodations amenities" formControlName="amenities"  multiple>
+          <mat-chip-option id="freeWiFi">Free Wi-Fi</mat-chip-option>
+          <mat-chip-option id="freeParking">Free Parking</mat-chip-option>
+          <mat-chip-option id="airConditioner">Air conditioner</mat-chip-option>
+          <mat-chip-option id="kitchen">Kitchen</mat-chip-option>
+        </mat-chip-listbox>
+    </div>
+      <mat-form-field appearance="outline">
+        <mat-label>Minimum price</mat-label>
+        <input id="minPriceInput" matInput placeholder="Minimum price" formControlName="minPrice" type="number">
+        <mat-error *ngIf="filterAccommodationForm.get('minPrice')?.hasError('pattern')">Enter a valid number</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Maximum price</mat-label>
+        <input id="maxPriceInput" matInput placeholder="Maximum price" formControlName="maxPrice" type="number">
+        <mat-error *ngIf="filterAccommodationForm.get('maxPrice')?.hasError('pattern')">Enter a valid number</mat-error>
+      </mat-form-field>
+      
+    </form>
+    <button id="filterBtn" (click)="filterData()" style="display: block; margin: 0 auto;">Show filter results</button>

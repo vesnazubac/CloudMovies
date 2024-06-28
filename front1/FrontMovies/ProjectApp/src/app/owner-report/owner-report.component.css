@@ -1,0 +1,32 @@
+*{
+    font-size: medium;
+  }
+  .register-header {
+    color: #007bff; 
+    font-size: 24px;
+    margin-bottom: 3%;
+    margin-top: 5%;
+  }
+.date-picker-container {
+    text-align: center;
+    width: 70%;
+    margin: 0 auto;  
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1%; 
+    margin-bottom: 2%;
+  }
+  
+  mat-form-field {
+    flex: 1; 
+  }
+
+  .mat-elevation-z8{
+    margin:auto;
+    text-align:center;
+    width: 80%;
+    margin-top: 2%;
+    padding:1%;
+    box-shadow: none;
+}

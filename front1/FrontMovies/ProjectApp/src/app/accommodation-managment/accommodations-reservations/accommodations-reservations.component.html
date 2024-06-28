@@ -1,0 +1,203 @@
+<div class="mat-elevation-z8">
+    <h2 style="margin-left: 10px;">Pending Reservations</h2>
+    <table mat-table [dataSource]="dataSourcePending" matSort>
+      
+    
+      <ng-container matColumnDef="Id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Start Date">
+        <th mat-header-cell *matHeaderCellDef> Start Date</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.timeSlot.startDate | date: 'shortDate'}}
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="End Date">
+        <th mat-header-cell *matHeaderCellDef> End Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.timeSlot.endDate | date: 'shortDate'}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Guests number">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guests number</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.numberOfGuests}}
+          </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="Status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Guest name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guest name </th>
+        <td mat-cell *matCellDef="let element"> {{element.user.username}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Num of cancellations">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Num of cancellations </th>
+        <td mat-cell *matCellDef="let element"> {{numberOfCancelledReservations(element.user.username)}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="primary"(click)="approveRequest(element)" style="margin-right: 20px;">
+            Approve
+          </button>
+      
+          <button mat-raised-button color="warn" (click)="rejectRequest(element)">
+            Reject
+          </button>
+        </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsPending"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsPending;"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                   showFirstLastButtons
+                   aria-label="Select page of periodic elements">
+    </mat-paginator>
+  </div>
+
+
+  <div class="mat-elevation-z8">
+    <h2 style="margin-left: 10px;">Approved reservations</h2>
+    <table mat-table [dataSource]="dataSourceApproved" matSort>
+      
+    
+      <ng-container matColumnDef="Id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Start Date">
+        <th mat-header-cell *matHeaderCellDef> Start Date</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.timeSlot.startDate | date: 'shortDate'}}
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="End Date">
+        <th mat-header-cell *matHeaderCellDef> End Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.timeSlot.endDate | date: 'shortDate'}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Guests number">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guests number</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.numberOfGuests}}
+          </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="Status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Guest name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guest name </th>
+        <td mat-cell *matCellDef="let element"> {{element.user.username}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Num of cancellations">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Num of cancellations </th>
+        <td mat-cell *matCellDef="let element"> {{numberOfCancelledReservations(element.user.username)}} </td>
+      </ng-container>
+
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <!-- <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                   showFirstLastButtons
+                   aria-label="Select page of periodic elements">
+    </mat-paginator> -->
+  </div>
+
+  <div class="mat-elevation-z8">
+    <h2 style="margin-left: 10px;">Rejected Reservations</h2>
+    <table mat-table [dataSource]="dataSourceRejected" matSort>
+      
+    
+      <ng-container matColumnDef="Id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Start Date">
+        <th mat-header-cell *matHeaderCellDef> Start Date</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.timeSlot.startDate | date: 'shortDate'}}
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="End Date">
+        <th mat-header-cell *matHeaderCellDef> End Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.timeSlot.endDate | date: 'shortDate'}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Guests number">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guests number</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.numberOfGuests}}
+          </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="Status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Guest name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guest name </th>
+        <td mat-cell *matCellDef="let element"> {{element.user.username}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Num of cancellations">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Num of cancellations </th>
+        <td mat-cell *matCellDef="let element"> {{numberOfCancelledReservations(element.user.username)}} </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <form [formGroup]="searchReservationsForm">
+      <div class="data-container">
+        <h2 class="register-header">Search reservations</h2>
+        <mat-form-field appearance="outline">
+          <mat-label>Accommodation name:</mat-label>
+          <input matInput placeholder="Accommodation name:" formControlName="accName">
+          <mat-error *ngIf="searchReservationsForm.get('accName')?.hasError('required')">This field is required</mat-error>
+        </mat-form-field>
+    
+        <div class="date-picker-container">
+          <mat-form-field>
+            <mat-label>Choose a start date</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+        
+          <mat-form-field>
+            <mat-label>Choose an end date</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+    
+        <button (click)="searchReservations()" mat-button style="background-color: #1e88e5; color: white; margin-top: 4%; margin-right: 8px;">Search</button>
+        <button (click)="showAll()" mat-button style="background-color: #1e88e5; color: white; margin-top: 4%; margin-left: 8px;">Show all</button>
+      </div>
+    </form>
+  </div>
+

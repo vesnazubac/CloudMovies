@@ -1,0 +1,119 @@
+<div class="details-container">
+  <div class="heading">
+    <h2>
+      {{ accommodation?.name }}
+      <button *ngIf="role === 'GUEST' && isInGuestFavourites(accommodation?.id ?? 0)" class="favourites-button" (click)="removeFromFavourites()">
+          Remove from favourites
+      </button>
+      <button *ngIf="role === 'GUEST' && !isInGuestFavourites(accommodation?.id ?? 0)" class="favourites-button" (click)="addToFavourites()">
+          Add to favourites
+      </button>
+  </h2>
+  <div *ngIf="accommodation && accommodation.images && accommodation.images.length > 0; else noImages">
+    <img [src]="accommodation.images[0]" alt="{{ accommodation?.name }} Image">
+  </div>
+
+  <ng-template #noImages>
+    <!-- Show a default image if there are no images -->
+    <img src="../../../assets/images/accommodation1.jpg" alt="Default Image">
+  </ng-template>
+  </div>
+    
+    <div class="content">
+      <p><strong>Description:</strong> {{ accommodation?.description }}</p>
+    <p><strong>Location:</strong> {{ accommodation?.location?.country }}, {{accommodation?.location?.city}}, {{accommodation?.location?.address}}</p>
+    <p><strong>Guests:</strong> {{ accommodation?.minGuests }} - {{ accommodation?.maxGuests }}</p>
+    <p><strong>Status:</strong> {{ accommodation?.status }}</p>
+    <p><strong>Accommodation average grade: </strong>{{averageGradeAccommodation ?? 0.00   | number: '1.2-2'}}</p>
+    <p><strong>Owners Average grade: </strong>{{averageGradeOwner ?? 0.00   | number: '1.2-2'}}</p>
+    <!--<p><strong>Rating:</strong> {{accommodation.rating}}</p>-->
+    <p><strong>Assets:</strong></p>
+    <div class="options-container">
+      <div *ngFor="let asset of accommodation?.assets" class="custom-chip">{{ asset }}</div>
+    </div>
+
+  <p><strong>Additional Images:</strong></p>
+    <!-- Iterate over all images starting from index 1 -->
+    <div class="image-container" *ngIf="accommodation && accommodation?.images && accommodation.images.length > 1">
+      <div *ngFor="let image of accommodation.images.slice(1); let i = index" class="image-thumbnail" [style.backgroundImage]="'url(' + image + ')'" [attr.alt]="accommodation?.name + ' Image ' + (i + 1)"></div>
+    </div>
+
+    
+    
+    <button (click)="goBack()" style="margin-top: 3%;margin-left: 80%;"><mat-icon>arrow_back</mat-icon></button>
+    </div>
+    
+  </div>
+  <br>
+  <p style="padding-left:25px;"><strong>Accommodation reviews:</strong></p>
+    <div *ngFor="let review of this.accommodationReviews">
+      <div class="review">
+        <p><strong>User ID:</strong> {{ review.userId }}</p>
+        <p><strong>Reviewing </strong> {{ review.type }}</p>
+        <p><strong>Comment:</strong> {{ review.comment }}</p>
+        <p><strong>Grade:</strong> {{ review.grade }}</p>
+        <p><strong>Date:</strong> {{ review.dateTime | date:'medium' }}</p>
+        <!-- <p><strong>Average grade: </strong>{{calculateAverageGradeAccommodation(review.accommodationId)}}</p> -->
+        <button class="dugme-delete" *ngIf="review?.userId == loggedInUserId" (click)="deleteReview(review.id)" >Delete</button>
+      </div>
+    </div>
+
+    <p style="padding-left:25px;"><strong>Owner reviews:</strong></p>
+    <div *ngFor="let review of this.ownerReviews">
+      <div class="review">
+        <p><strong>User ID:</strong> {{ review.userId }}</p>
+        <p><strong>Reviewing </strong> {{ review.type }}</p>
+        <p><strong>Comment:</strong> {{ review.comment }}</p>
+        <p><strong>Grade:</strong> {{ review.grade }}</p>
+        <p><strong>Date:</strong> {{ review.dateTime | date:'medium' }}</p>
+        <!-- <p><strong>Average grade:</strong>{{ calculateAverageGradeOwner(review.ownerId) }}</p> -->
+
+        <button class="dugme-delete" *ngIf="review?.userId == loggedInUserId" (click)="deleteReview(review.id)" >Delete</button>
+      </div>
+    </div>
+    <div class="mat-elevation-z8">
+      <h2 style="margin-left: 10px;">Prices and availability intervals</h2>
+      <table mat-table [dataSource]="dataSource" matSort>
+        
+      
+        <ng-container matColumnDef="Id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+          <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="Start Date">
+          <th mat-header-cell *matHeaderCellDef> Start Date</th>
+          <td mat-cell *matCellDef="let element"> 
+            {{element.timeSlot.startDate | date: 'shortDate'}}
+          </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="End Date">
+          <th mat-header-cell *matHeaderCellDef> End Date </th>
+          <td mat-cell *matCellDef="let element"> {{element.timeSlot.endDate | date: 'shortDate'}}</td>
+        </ng-container>
+    
+        <ng-container matColumnDef="Price">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Price </th>
+          <td mat-cell *matCellDef="let element"> 
+            {{element.price}}
+            </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="Type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type </th>
+          <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+        </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                     showFirstLastButtons
+                     aria-label="Select page of periodic elements">
+      </mat-paginator>
+    </div>
+    
+  <app-map></app-map>
+  <app-reservation *ngIf="role == 'GUEST'"></app-reservation>

@@ -1,0 +1,173 @@
+.example-container mat-form-field + mat-form-field {
+    margin-left: 8px;
+  }
+
+  .example-container {
+    display: flex;
+    margin-top: 30px;
+    flex-direction: column;
+    align-items: center;
+  }
+ 
+  
+  .register-header {
+    color: #007bff; 
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .error-message {
+    color: red;
+    margin-top: 15px;
+  }
+
+  .example-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .form-field label {
+    margin-right: 10px;
+  }
+  .other-fields{
+    width: 250px;
+  }
+
+  .details-container {
+    max-width: 100%;
+    margin: auto;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    display: flex;
+  }
+  .heading{
+    margin-right: 20px;
+    flex:1;
+  }
+  .content {
+    margin-top: 50px;
+    flex: 2;
+  }
+  img {
+    width: 600px;
+    height: auto;
+    margin-bottom: 15px;
+  }
+  .custom-chip {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 4px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  h2 {
+    color: #333;
+    font-size: 30px;
+  }
+  
+  p {
+    margin-bottom: 15px;
+    font-size: 20px;
+  }
+  
+  button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  .image-container {
+    display: flex;
+    flex-wrap: nowrap; /* Ensure images stay in a single row */
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+    margin-top: 15px;
+  }
+  
+  .image-thumbnail {
+    width: 200px; /* Adjust the width of each thumbnail as needed */
+    height: 200px; /* Adjust the height of each thumbnail as needed */
+    background-size: cover;
+    background-position: center;
+    margin-right: 10px; /* Adjust the margin between thumbnails as needed */
+    border: 1px solid #ddd; /* Add a border for better visibility */
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+  }
+  
+  .image-thumbnail:hover {
+    border-color: #007bff; /* Highlight border color on hover */
+  }
+
+ 
+  
+  .review p {
+    margin: 5px 0;
+  }
+  
+  .review strong {
+    padding: 20px;
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  .mat-elevation-z8{
+    margin:auto;
+    text-align:center;
+    width: 80%;
+    margin-top: 2%;
+    padding:1%;
+    box-shadow: none;
+}
+  .data-container {
+    max-width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+
+  .date-picker-container {
+    text-align: center;
+    width: 90%;
+    margin: 0 auto;  
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1%; 
+    margin-bottom: 2%;
+  }
+.dugme-report{
+    margin-top: 10px; /* Adjust as needed for spacing between the content and the button */
+    margin-left: auto;
+  }
+
+  .review {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 700px;
+    display: flex;
+  flex-direction: column;
+  }
+  
+  
+
+  
+  

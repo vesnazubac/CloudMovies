@@ -1,0 +1,26 @@
+<div class="example-container">
+    <h2 class="register-header">Report User</h2>
+  
+    <form [formGroup]="reportOwnerForm" class="example-form">
+      <p class="form-field">
+        <label for="ownerUsername">User username:</label>
+        <input matInput class="form-field-user" formControlName="ownerId"   placeholder="User username:"  required/>
+      </p>
+
+      <p class="form-field">
+        <label>Reason for report:</label>
+        <mat-form-field class="reason">
+          <mat-label>Write reason:</mat-label>
+          <textarea matInput  formControlName="reason"></textarea>
+        </mat-form-field>
+      </p>
+    </form>
+  
+    <div class="example-button-row">
+      <button (click)="reportOwner()" mat-raised-button color="primary">
+        Report user
+        <mat-icon class="icon">how_to_reg</mat-icon>
+      </button>
+    </div>
+  </div>
+  

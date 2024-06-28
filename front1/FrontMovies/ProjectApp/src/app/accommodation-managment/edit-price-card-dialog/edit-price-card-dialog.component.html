@@ -1,0 +1,44 @@
+<div mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="form-container">
+    
+    <div class="data-container">
+        <h2 id="h2Edit">Edit Dates and Price</h2>
+        <div class="date-picker-container" >
+          <mat-form-field>
+            <mat-label>Choose a start date</mat-label>
+            <input matInput id="startDateEdit" [matDatepicker]="startPicker" formControlName="startDateEdit">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+        
+          <mat-form-field>
+            <mat-label>Choose an end date</mat-label>
+            <input matInput id="endDateEdit"  [matDatepicker]="endPicker" formControlName="endDateEdit">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        
+          <mat-form-field appearance="outline">
+            <mat-label>Price</mat-label>
+            <input matInput id="priceEdit"  placeholder="Price for chosen period" formControlName="priceEdit">
+          </mat-form-field>
+        </div>
+
+        <div class="type-container" style="text-align: center;margin-bottom: 10px;">
+          <mat-radio-group aria-label="Select an option" formControlName="priceTypeEdit">
+            <mat-radio-button value="PERGUEST">PERGUEST</mat-radio-button>
+            <mat-radio-button value="PERUNIT">PERUNIT</mat-radio-button>
+          </mat-radio-group>
+        </div>
+    </div>
+
+    <div mat-dialog-actions class="dialog-actions" style="text-align: center; margin-bottom: 2%;">
+        <button mat-button (click)="onSaveClick()" mat-button style="background-color: #1e88e5; color: white; font-size:16px;margin-right: 25px;">Save</button>
+      <button mat-button (click)="onNoClick()" color="warn" style=" font-size: 16px;">Cancel</button>
+    
+    </div>
+
+  </form>
+</div>

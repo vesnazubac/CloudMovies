@@ -1,0 +1,80 @@
+*{
+    font-size: medium;
+  }
+.register-header {
+color: #007bff; 
+font-size: 24px;
+margin-bottom: 3%;
+margin-top: 5%;
+}
+.options-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1%;
+}
+.guests-container {
+display: flex;
+justify-content: center;
+
+}
+.type-container{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1%;
+}
+
+.reservation-confirmation-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1%;
+}
+
+.mat-mdc-radio-button ~ .mat-mdc-radio-button {
+margin-left: 16px;
+}
+
+.mat-elevation-z8{
+    margin:auto;
+    text-align:center;
+    width: 80%;
+    margin-top: 2%;
+    padding:1%;
+    box-shadow: none;
+}
+
+  .data-container {
+    max-width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+
+  .date-picker-container {
+    text-align: center;
+    width: 90%;
+    margin: 0 auto;  
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1%; 
+    margin-bottom: 2%;
+  }
+  
+  
+
+  .input-container {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.input-container label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.selected-option {
+  background-color: #ff5733; /* Postavite željenu boju pozadine */
+  color: #ffffff; /* Postavite željenu boju teksta */
+}
+

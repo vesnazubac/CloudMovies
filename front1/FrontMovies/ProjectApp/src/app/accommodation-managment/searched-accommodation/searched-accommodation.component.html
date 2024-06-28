@@ -1,0 +1,12 @@
+<mat-card class="custom-card">
+    <mat-card-content>
+      <h2>{{searchedAccommodation.accommodation.name}}</h2>
+      <p>{{searchedAccommodation.accommodation.location.country}}, {{searchedAccommodation.accommodation.location.city}}</p>
+      <img src="{{searchedAccommodation.accommodation.images}}">
+      <br>
+      <p>Total price:{{searchedAccommodation.totalPrice}}</p>
+      <p>Unit price:{{searchedAccommodation.unitPrice}}</p>
+      <p>Average rating:{{searchedAccommodation.averageRating}}</p>
+      <button (click)="showDetails()">Show details</button>
+    </mat-card-content>
+  </mat-card>

@@ -1,0 +1,5 @@
+
+<b>Kliknuto na: {{clickedWine}}</b>
+<div *ngFor="let wine of wines">
+  <app-wine-card (clicked)="onWineClicked($event)" [wine]="wine"></app-wine-card>
+</div>

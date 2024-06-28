@@ -1,0 +1,18 @@
+*{
+    font-size: medium;
+  }
+.register-header {
+color: #007bff; 
+font-size: 24px;
+margin-bottom: 3%;
+margin-top: 5%;
+text-align: center;
+}
+.mat-elevation-z8{
+    margin:auto;
+    text-align:center;
+    width: 60%;
+    margin-top: 2%;
+    padding:1%;
+    box-shadow: none;
+}

@@ -1,0 +1,21 @@
+<div class="example-container">
+    <h2 class="register-header">Reports {{this.userId}}</h2>
+
+    
+    <div *ngFor="let report of this.usersReports">
+      <div class="review">
+        <p style="text-align: center;"><strong>Reported User ID:</strong> {{ report.userThatIsReported }}</p>
+        <p></p>
+        <p><strong>Report reason : </strong> {{ report.reason }}</p>
+        <p><strong>Reported by :</strong> {{ report.userThatReports}}</p>
+        <p></p>
+    
+        <div class="button-container">
+            <button mat-raised-button color="warn" (click)="deactivateUser(report)">Deactivation of user</button>
+            <button mat-raised-button  (click)="ignoreReport(report)">Ignore Report</button>
+          </div>
+       
+      </div>
+    </div>
+    
+  </div>

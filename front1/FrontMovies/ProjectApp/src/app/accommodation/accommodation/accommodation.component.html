@@ -1,0 +1,17 @@
+<mat-card class="custom-card">
+  <mat-card-content>
+    <h2>{{accommodation.name}}</h2>
+    <div *ngIf="accommodation && accommodation.images && accommodation.images.length > 0; else noImages">
+      <!-- Show the first image if available -->
+      <img [src]="accommodation.images[0]" alt="{{ accommodation.name }} Image" style="width: 400px; height: 200px;">
+    </div>
+
+    <ng-template #noImages>
+      <!-- Show a default image if there are no images -->
+      <img src="../../../assets/images/accommodation1.jpg" alt="Default Image" style="width: 400px; height: 200px;">
+    </ng-template>
+    <br>
+    <button [routerLink]="['/accommodations', accommodation.id]">Show details</button>
+  </mat-card-content>
+</mat-card>
+  

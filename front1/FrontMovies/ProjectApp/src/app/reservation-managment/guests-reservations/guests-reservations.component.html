@@ -1,0 +1,221 @@
+<div class="mat-elevation-z8">
+    <h2 style="margin-left: 10px;">Pending Reservations</h2>
+    <table mat-table [dataSource]="dataSourcePending" matSort>
+      
+    
+      <ng-container matColumnDef="Id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Start Date">
+        <th mat-header-cell *matHeaderCellDef> Start Date</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.timeSlot.startDate | date: 'shortDate'}}
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="End Date">
+        <th mat-header-cell *matHeaderCellDef> End Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.timeSlot.endDate | date: 'shortDate'}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Guests number">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guests number</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.numberOfGuests}}
+          </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="Status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="warn"(click)="deleteReservation(element.id)" style="margin-right: 20px;">
+            Delete
+          </button>
+        </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsApproved"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsApproved;"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                   showFirstLastButtons
+                   aria-label="Select page of periodic elements">
+    </mat-paginator>
+  </div>
+
+
+  <div class="mat-elevation-z8">
+    <h2 style="margin-left: 10px;">Approved reservations</h2>
+    <table mat-table [dataSource]="dataSourceApproved" id="approvedReservationsTable" matSort>
+      
+    
+      <ng-container matColumnDef="Id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Start Date">
+        <th mat-header-cell *matHeaderCellDef> Start Date</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.timeSlot.startDate | date: 'shortDate'}}
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="End Date">
+        <th mat-header-cell *matHeaderCellDef> End Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.timeSlot.endDate | date: 'shortDate'}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Guests number">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guests number</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.numberOfGuests}}
+          </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="Status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="warn" id="cancelReservationButton" (click)="cancelReservation(element)" style="margin-right: 20px;">
+            Cancel 
+          </button>
+          <button mat-raised-button color="primary" (click)="rateOwner(element.accommodation.id)" style="margin-right: 20px;">
+            <mat-icon>feedback</mat-icon>
+            Rate owner 
+          </button>
+          <button mat-raised-button color="primary" (click)="rateAccommodation(element.accommodation.id,element.id)" style="margin-right: 20px;">
+            <mat-icon>feedback</mat-icon>
+            Rate accommodation
+          </button>
+      
+        </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsApproved"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsApproved;"></tr>
+    </table>
+  </div>
+
+  <div class="mat-elevation-z8">
+    <h2 style="margin-left: 10px;">Cancelled Reservations</h2>
+    <table mat-table [dataSource]="dataSourceCancelled" id="cancelledReservationsTable" matSort>
+      
+    
+      <ng-container matColumnDef="Id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Start Date">
+        <th mat-header-cell *matHeaderCellDef> Start Date</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.timeSlot.startDate | date: 'shortDate'}}
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="End Date">
+        <th mat-header-cell *matHeaderCellDef> End Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.timeSlot.endDate | date: 'shortDate'}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Guests number">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guests number</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.numberOfGuests}}
+          </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="Status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+  </div>
+
+  <div class="mat-elevation-z8">
+    <h2 style="margin-left: 10px;">Rejected Reservations</h2>
+    <table mat-table [dataSource]="dataSourceRejected" matSort>
+      
+    
+      <ng-container matColumnDef="Id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Start Date">
+        <th mat-header-cell *matHeaderCellDef> Start Date</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.timeSlot.startDate | date: 'shortDate'}}
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="End Date">
+        <th mat-header-cell *matHeaderCellDef> End Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.timeSlot.endDate | date: 'shortDate'}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="Guests number">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Guests number</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.numberOfGuests}}
+          </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="Status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <form [formGroup]="searchReservationsForm">
+      <div class="data-container">
+        <h2 class="register-header">Search reservations</h2>
+        <mat-form-field appearance="outline">
+          <mat-label>Accommodation name:</mat-label>
+          <input matInput placeholder="Accommodation name:" formControlName="accName">
+          <mat-error *ngIf="searchReservationsForm.get('accName')?.hasError('required')">This field is required</mat-error>
+        </mat-form-field>
+    
+        <div class="date-picker-container">
+          <mat-form-field>
+            <mat-label>Choose a start date</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+        
+          <mat-form-field>
+            <mat-label>Choose an end date</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+    
+        <button (click)="searchReservations()" mat-button style="background-color: #1e88e5; color: white; margin-top: 4%; margin-right: 8px;">Search</button>
+        <button (click)="showAll()" mat-button style="background-color: #1e88e5; color: white; margin-top: 4%; margin-left: 8px;">Show all</button>
+      </div>
+    </form>
+  </div>

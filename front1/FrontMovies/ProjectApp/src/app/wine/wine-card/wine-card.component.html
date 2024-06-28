@@ -1,0 +1,8 @@
+<mat-card>
+<!--  (click)="onWineClicked()"-->
+  <mat-card-content>
+    <b [routerLink]="['/wine', wine.id]">{{wine.name}}</b>
+    <p>{{wine.country}}</p>
+    <p>{{wine.year}}</p>
+  </mat-card-content>
+</mat-card>

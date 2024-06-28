@@ -1,0 +1,101 @@
+mat-toolbar {
+  background-color: #03354c !important;
+  display: flex;
+  align-items: center;
+  height: 50px; /* Visina nav bara */
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: 500; /* Manje debljine */
+  color: white;
+  margin-right: 20px;
+  font-style: italic; /* Ukoseno */
+}
+
+.search-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Vertikalno centriranje */
+  color: white;
+  height: 100%; /* Visina unutar nav bara */
+}
+
+.example-form {
+  height: 36px; /* Visina polja za pretragu */
+  display: flex;
+  align-items: center;
+}
+
+.example-full-width {
+  width: 200px; /* Širina polja za pretragu */
+  border-radius: 20px; /* Zaobljene ivice */
+  border: 1px solid white; /* Bele ivice */
+  background: transparent; /* Providna pozadina */
+  height: 56px; /* Visina polja za pretragu */
+  display: flex;
+  align-items: center; /* Vertikalno centriranje */
+  padding: 0 10px; /* Unutrašnje margine */
+}
+
+.example-full-width .mat-form-field-flex {
+  height: 100px; /* Visina unutar polja za pretragu */
+  display: flex;
+  align-items: center; /* Vertikalno centriranje */
+}
+
+.example-full-width .mat-form-field-label {
+  color: white; /* Bela boja za labelu */
+  line-height: 36px; /* Vertikalno poravnanje */
+}
+
+.example-full-width .mat-input-element {
+  color: white; /* Bela boja teksta */
+  background: transparent; /* Providna pozadina */
+  height: 66px; /* Visina input polja */
+ 
+}
+
+.example-full-width .mat-icon {
+  color: white; /* Bela boja za ikonu */
+  height: 24px; /* Visina ikone */
+  line-height: 36px; /* Vertikalno poravnanje */
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: auto;
+}
+
+button {
+  margin-right: 10px;
+  height: 36px; /* Visina dugmeta */
+}
+
+.mojaklasa{
+  margin-left: 600px;
+  line-break: none;
+  margin-right: 20px;
+  height: 60px;
+  padding-top: 20px;
+  border-radius: 20px;
+  
+}
+.tekstic{
+    margin-top: 10px !important;
+    list-style-image: none;
+    line-break: none;
+    
+}
+
+.ikonica{
+
+  height: 20px !important
+}
+
+.example-full-width .mat-form-field-wrapper {
+  padding-bottom: 0px !important; /* Uklanjanje paddinga ispod polja za pretragu */
+}

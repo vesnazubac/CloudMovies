@@ -1,0 +1,42 @@
+<mat-toolbar>
+  <span class="logo-text">Explore, watch, enjoy!</span>
+
+  <!-- <div class="search-container">
+    <form class="example-form">
+      <mat-form-field class="example-full-width"> -->
+        <mat-form-field class="mojaklasa">
+        
+        <input type="text"  class ='tekstic' matInput placeholder="Search movie"/>
+        <mat-icon  matSuffix>search</mat-icon>
+       
+       </mat-form-field>
+    <!-- </form>
+  </div>  -->
+
+  <div class="button-container">
+    <button *ngIf="isLoggedIn()" [routerLink]="['myNotifications']" mat-raised-button>
+      <mat-icon>notifications</mat-icon>
+    </button>
+    <!-- <button   mat-raised-button  (click)="testClicked()">Testic</button> -->
+
+   
+    <button *ngIf="role == 'ADMIN'" [routerLink]="['adminRatingRequests']" mat-raised-button>Rating requests</button>
+    <button *ngIf="role == 'OWNER'" [routerLink]="['ownersAccommodations']" mat-raised-button>My Accommodations</button>
+    <button *ngIf="role == 'GUEST'" [routerLink]="['guestsReservations']" mat-raised-button>My Reservations</button>
+    <button *ngIf="role == 'ADMIN'" [routerLink]="['accommodationsRequests']" mat-raised-button>Accommodation requests</button>
+    <button *ngIf="role == 'OWNER'" [routerLink]="['createAccommodation']" mat-raised-button>Create Accommodation</button>
+    <button *ngIf="role == 'ADMIN'" [routerLink]="['users-view']" mat-raised-button>View users</button>
+    <button *ngIf="isLoggedIn()" [routerLink]="['editAccount']" mat-raised-button>Edit Account</button>
+    <button *ngIf="!isLoggedIn()" [routerLink]="['register']" mat-raised-button>Register</button>
+    <button *ngIf="!isLoggedIn()" [routerLink]="['login']" mat-raised-button>Log in</button>
+    <button [routerLink]="['home']" mat-raised-button>Home</button>
+    <button *ngIf="isLoggedIn()" [routerLink]="['home']" (click)="logout()" mat-raised-button>Log out</button>
+    <button *ngIf="role == 'OWNER'" [routerLink]="['ownerRatings']" mat-raised-button>My reviews</button>
+    <button *ngIf="role == 'OWNER'" [routerLink]="['userReports']" mat-raised-button>Report guest</button>
+    <button *ngIf="role == 'GUEST'" [routerLink]="['userReports']" mat-raised-button>Report owner</button>
+    <button *ngIf="role=='GUEST'" [routerLink]="['favouriteAccommodations']" mat-raised-button>Favourite accommodations</button>
+    <button *ngIf="role=='OWNER'" [routerLink]="['ownerReport']" mat-raised-button>Owner reports</button>
+  </div>
+
+  
+</mat-toolbar>

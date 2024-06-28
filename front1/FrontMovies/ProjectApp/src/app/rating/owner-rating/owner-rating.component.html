@@ -1,0 +1,37 @@
+<div class="example-container">
+    <h2 class="register-header">Rate Owner</h2>
+  
+    <form [formGroup]="createOwnerRatingForm" class="example-form">
+      <p class="form-field">
+        <label for="ownerUsername">Owner username:</label>
+        <input matInput formControlName="ownerId"   placeholder="Owner username:" readonly required>
+      </p>
+  
+      <p class="form-field">
+        <label>Your rate:</label>
+        <mat-radio-group aria-label="Select an option" formControlName="rating">
+          <mat-radio-button value="1">1</mat-radio-button>
+          <mat-radio-button value="2">2</mat-radio-button>
+          <mat-radio-button value="3">3</mat-radio-button>
+          <mat-radio-button value="4">4</mat-radio-button>
+          <mat-radio-button value="5">5</mat-radio-button>
+        </mat-radio-group>
+      </p>
+  
+      <p class="form-field">
+        <label>Your comment:</label>
+        <mat-form-field>
+          <mat-label>Comment</mat-label>
+          <textarea matInput formControlName="comment"></textarea>
+        </mat-form-field>
+      </p>
+    </form>
+  
+    <div class="example-button-row">
+      <button (click)="rateOwner()" mat-raised-button color="primary">
+        Rate owner
+        <mat-icon class="icon">how_to_reg</mat-icon>
+      </button>
+    </div>
+  </div>
+  

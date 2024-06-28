@@ -1,0 +1,18 @@
+
+<div class="example-container">
+    <h2 class="register-header">My ratings</h2>
+
+    
+    <div *ngFor="let review of this.ownerReviews">
+      <div class="review">
+        <p><strong>User ID:</strong> {{ review.userId }}</p>
+        <p><strong>Reviewing </strong> {{ review.type }}</p>
+        <p><strong>Comment:</strong> {{ review.comment }}</p>
+        <p><strong>Grade:</strong> {{ review.grade }}</p>
+        <p><strong>Date:</strong> {{ review.dateTime | date:'medium' }}</p>
+        <button class="dugme-report" (click)="reportReview(review,review.id)">Report</button>
+      </div>
+    </div>
+    
+  </div>
+  

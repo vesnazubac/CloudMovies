@@ -1,0 +1,47 @@
+*{
+    font-size: medium;
+  }
+  .register-header {
+    color: #007bff; 
+    font-size: 24px;
+    margin-bottom: 3%;
+    margin-top: 5%;
+  }
+  .card-container {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content:first baseline;
+    margin-bottom: 100px;
+  }
+  mat-form-field {
+    flex: 1; 
+  }
+  h2,h3{
+    color: #007bff; 
+  }
+  .data-container {
+    text-align: center;
+    max-width: 60%;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  .date-picker-container {
+    text-align: center;
+    width: 70%;
+    margin: 0 auto;  
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1%; 
+    margin-bottom: 2%;
+  }
+
+  .mat-elevation-z8{
+    margin:auto;
+    text-align:center;
+    width: 90%;
+    margin-top: 2%;
+    padding:1%;
+}

@@ -1,0 +1,66 @@
+<div class="mat-elevation-z8">
+    <h2 style="margin-left: 10px;">Pending owner`s review requests</h2>
+    <table mat-table [dataSource]="dataSourceOwners">
+      
+    
+      <ng-container matColumnDef="ownerId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Username </th>
+        <td mat-cell *matCellDef="let element"> {{element.ownerId}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="numOfReviews">
+        <th mat-header-cell *matHeaderCellDef>Num of pending requests</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.numOfReviews}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="primary" style="margin-right: 20px;" (click)="viewOwnersReviews(element.ownerId)">
+            View requests 
+          </button>  
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsOwner"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsOwner;"></tr>
+    </table>
+  </div>
+
+
+  <div class="mat-elevation-z8">
+    <h2 style="margin-left: 10px;">Pending accommodation`s review requests</h2>
+    <table mat-table [dataSource]="dataSourceAccommodations" matSort>
+      
+    
+      <ng-container matColumnDef="accommodationId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Accommodation id </th>
+        <td mat-cell *matCellDef="let element"> {{element.accommodationId}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="numOfReviews">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Num of pending requests</th>
+        <td mat-cell *matCellDef="let element"> 
+          {{element.numOfReviews}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="primary" style="margin-right: 20px;" (click)="viewAccommodationsReviews(element.accommodationId)">
+            View requests 
+          </button>  
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsAccommodation"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsAccommodation;"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+    showFirstLastButtons
+    aria-label="Select page of periodic elements">
+</mat-paginator>
+  </div>
+
+  

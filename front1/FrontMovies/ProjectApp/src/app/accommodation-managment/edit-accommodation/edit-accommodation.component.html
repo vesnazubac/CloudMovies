@@ -1,0 +1,260 @@
+<form [formGroup]="editAccommodationFormGroup">
+<div  style="text-align: center;">
+    <h2 class="register-header">Edit Accommodations Data</h2>
+  
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" [value]="accommodation?.name" (input)="onNameInput($event)">
+      <mat-icon matSuffix>edit_note</mat-icon>
+      <mat-error *ngIf="editAccommodationFormGroup.get('name')?.hasError('required')">This field is required</mat-error>
+  </mat-form-field>
+    
+     
+      <div class="type-container">
+        <!-- <mat-label>Type of accommodation : </mat-label> -->
+        <mat-chip-listbox aria-label="Accommodation type selection" formControlName="type" (input)="onTypeInput($event)">
+          <mat-chip-option>APARTMENT</mat-chip-option>
+          <mat-chip-option>ROOM</mat-chip-option>
+          <mat-chip-option>VIP_ROOM</mat-chip-option>
+        </mat-chip-listbox>
+        <!-- <mat-radio-group aria-label="Select an option" formControlName="type"  (input)="onTypeInput($event)">
+          <mat-radio-button  [value]="accommodationTypeEnum.ROOM" [checked]="accommodation?.type === AccommodationTypeEnum.ROOM">ROOM</mat-radio-button>
+          <mat-radio-button  [value]="accommodationTypeEnum.APARTMENT" [checked]="accommodation?.type === AccommodationTypeEnum.APARTMENT">APARTMENT</mat-radio-button>
+          <mat-radio-button  [value]="accommodationTypeEnum.VIP_ROOM" [checked]="accommodation?.type === AccommodationTypeEnum.VIP_ROOM">VIP ROOM</mat-radio-button>
+        </mat-radio-group> -->
+      </div>
+      <p>
+        <div class="data-container">
+        <h2>Location Data</h2>
+        <mat-form-field appearance="outline">
+          <mat-label>Address</mat-label>
+          <input matInput placeholder="Address" [value]="accommodation?.location?.address" formControlName="address"  (input)="onAddressInput($event)" >
+          <mat-icon matSuffix>edit_note</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>City</mat-label>
+          <input matInput placeholder="City" formControlName="city" [value]="accommodation?.location?.city" (input)="onCityInput($event)" >
+          <mat-icon matSuffix>edit_note</mat-icon>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Country</mat-label>
+          <input matInput placeholder="Country" formControlName="country"  [value]="accommodation?.location?.country" (input)="onCountryInput($event)"  >
+          <mat-icon matSuffix>edit_note</mat-icon>
+        </mat-form-field>
+      
+      <!-- <p>
+        <mat-form-field appearance="outline">
+          <mat-label>X coordinate</mat-label>
+          <input matInput placeholder="X coordinate" formControlName="xCoordinate"  [value]="accommodation?.location?.x"  (input)="onXInput($event)" >
+        <mat-icon matSuffix>edit_note</mat-icon>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Y coordinate</mat-label>
+        <input matInput placeholder="Y coordinate" formControlName="yCoordinate"  [value]="accommodation?.location?.y" (input)="onYInput($event)" >
+        <mat-icon matSuffix>edit_note</mat-icon>
+      </mat-form-field></p> -->
+
+    </div>
+      
+      <div class="guests-container">
+        <p style="margin-right: 10px;">
+          <mat-form-field appearance="outline">
+            <mat-label>Min Guests</mat-label>
+            <input matInput placeholder="Min guests" formControlName="minGuests"  [value]="accommodation?.minGuests" (input)="onMinGuestsInput($event)" >
+            <mat-icon matSuffix>edit_note</mat-icon>
+            <mat-error *ngIf="editAccommodationFormGroup.get('minGuests')?.hasError('required')">This field is required</mat-error>
+            <mat-error *ngIf="editAccommodationFormGroup.get('minGuests')?.hasError('pattern')">Enter a valid number</mat-error>
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field appearance="outline">
+            <mat-label>Max Guests</mat-label>
+            <input matInput placeholder="Max guests" formControlName="maxGuests"  [value]="accommodation?.maxGuests" (input)="onMaxGuestsInput($event)" >
+            <mat-icon matSuffix>edit_note</mat-icon>
+            <mat-error *ngIf="editAccommodationFormGroup.get('minGuests')?.hasError('required')">This field is required</mat-error>
+            <mat-error *ngIf="editAccommodationFormGroup.get('minGuests')?.hasError('pattern')">Enter a valid number</mat-error>
+          </mat-form-field>
+        </p>
+      </div>
+      
+      <p>
+        <mat-form-field appearance="outline">
+          <mat-label>Cancellation Deadline</mat-label>
+          <input matInput id="cancellationDeadline" placeholder="Cancellation Deadline" formControlName="cancellationDeadline"  [value]="accommodation?.cancellationDeadline" (input)="onCancellationDeadlineInput($event)" >
+          <mat-icon matSuffix>edit_note</mat-icon>
+          <mat-error *ngIf="editAccommodationFormGroup.get('cancellationDeadline')?.hasError('required')">This field is required</mat-error>
+          <mat-error *ngIf="editAccommodationFormGroup.get('cancellationDeadline')?.hasError('pattern')">Enter a valid number</mat-error>
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field appearance="outline">
+          <mat-label>Description</mat-label>
+          <input matInput placeholder="Description" formControlName="description" [value]="accommodation?.description || ''" (input)="onDescriptionInput($event)" >
+          <mat-icon matSuffix>edit_note</mat-icon>
+          <mat-error *ngIf="editAccommodationFormGroup.get('description')?.hasError('required')">This field is required</mat-error>
+        </mat-form-field>
+      </p>
+      
+      <p>Accommodations amenities : </p>
+      <div class="options-container">
+        <mat-chip-listbox aria-label="Accommodations amenities" multiple formControlName="amenities" (input)="onAmenitiesInput($event)">
+          <mat-chip-option >Free Wi-Fi</mat-chip-option>
+          <mat-chip-option>Free Parking</mat-chip-option>
+          <mat-chip-option>Air conditioner</mat-chip-option>
+          <mat-chip-option>Kitchen</mat-chip-option>
+        </mat-chip-listbox>
+    </div>
+    <p>Reservation confirmation : </p>
+    <div class="reservation-confirmation-container">
+      <mat-chip-listbox aria-label="Reservation confirmation selection" formControlName="reservationConfirmation" (input)="onReservationConfirmationInput($event)">
+        <mat-chip-option>MANUAL</mat-chip-option>
+        <mat-chip-option>AUTOMATIC</mat-chip-option>
+      </mat-chip-listbox>
+      <!-- <mat-radio-group aria-label="Select an option" formControlName="reservationConfirmation" (input)="onReservationConfirmationInput($event)">
+        <mat-radio-button value="0" [checked]="accommodation?.reservationConfirmation === 'MANUAL'">MANUAL</mat-radio-button>
+        <mat-radio-button value="1" [checked]="accommodation?.reservationConfirmation === 'AUTOMATIC'">AUTOMATIC</mat-radio-button>
+      </mat-radio-group> -->
+    </div>
+    <div class="mat-elevation-z8">
+      <h2>Prices and availability intervals</h2>
+      <table mat-table [dataSource]="dataSource" matSort>
+        
+      
+        <ng-container matColumnDef="Id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+          <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="Start Date">
+          <th mat-header-cell *matHeaderCellDef> Start Date</th>
+          <td mat-cell *matCellDef="let element"> 
+            {{element.timeSlot.startDate | date: 'shortDate'}}
+          </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="End Date">
+          <th mat-header-cell *matHeaderCellDef> End Date </th>
+          <td mat-cell *matCellDef="let element"> {{element.timeSlot.endDate | date: 'shortDate'}}</td>
+        </ng-container>
+    
+        <ng-container matColumnDef="Price">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Price </th>
+          <td mat-cell *matCellDef="let element"> 
+            {{element.price}}
+            </td>
+        </ng-container>
+        
+        <ng-container matColumnDef="Type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type </th>
+          <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button  (click)="openEditDialog(element)">
+              <mat-icon>edit</mat-icon>
+            </button>
+        
+            <button mat-icon-button  (click)="deleteItem(element)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    
+      <mat-paginator [pageSizeOptions]="[30, 40, 50]"
+                     showFirstLastButtons
+                     aria-label="Select page of periodic elements">
+      </mat-paginator>
+      <div class="data-container">
+        <h2>Add new price card</h2>
+        <div class="date-picker-container">
+          <mat-form-field>
+            <mat-label>Choose a start date</mat-label>
+            <input matInput  id="startDate" [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+        
+          <mat-form-field>
+            <mat-label>Choose an end date</mat-label>
+            <input matInput id="endDate" [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        
+          <mat-form-field appearance="outline">
+            <mat-label>Price for choosen period</mat-label>
+            <input matInput id="price" formControlName="price">
+            <mat-error *ngIf="editAccommodationFormGroup.get('price')?.hasError('required')">This field is required</mat-error>
+            <mat-error *ngIf="editAccommodationFormGroup.get('price')?.hasError('pattern')">Enter a valid number</mat-error>
+          </mat-form-field>
+    
+        </div>
+
+        <div class="type-container">
+          <mat-radio-group aria-label="Select an option" formControlName="priceType">
+            <mat-radio-button value="0">PERGUEST</mat-radio-button>
+            <mat-radio-button value="1">PERUNIT</mat-radio-button>
+          </mat-radio-group>
+        </div>
+        <button mat-button style="background-color: rgb(152, 198, 244);margin-bottom: 2%;" (click)="savePrice()">+ Save Price</button>
+    </div>
+
+
+
+    <div class="image-table-container">
+      <h2>Accommodation Images</h2>
+      <table mat-table [dataSource]="imageDataSource" matSort>
+    
+        <ng-container matColumnDef="Name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+          <td mat-cell *matCellDef="let image"> {{image.name}} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="Image">
+          <th mat-header-cell *matHeaderCellDef> Image </th>
+          <td mat-cell *matCellDef="let image"> 
+            <img [src]="image.path" alt="Accommodation Image" style="max-width: 100px; max-height: 100px;">
+          </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="Actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let image">
+            <button mat-icon-button (click)="deleteImage(image)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+    
+        <tr mat-header-row *matHeaderRowDef="imageDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: imageDisplayedColumns;"></tr>
+      </table>
+    </div>
+  </div>
+
+
+  
+
+
+    <div class="button-container">
+      <div class="buttons">
+      </div>
+      <input type="file" (change)="onFileSelected($event)" accept=".jpg, .jpeg, .png" />
+      <button mat-button style="background-color: rgb(163, 161, 161);margin-right: 15px;" (click)="addImage()">+ Add extra image</button>
+      </div>
+      <div style="align-items: center; text-align: center;margin-top: 3%;">
+        <button (click)="saveChanges()" mat-button  style="background-color: #1e88e5; color: white;font-size: 16px;">Save changes</button>
+        <button (click)="delete()" mat-fab background-color="red" style="margin-left: 2%;">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+   
+  

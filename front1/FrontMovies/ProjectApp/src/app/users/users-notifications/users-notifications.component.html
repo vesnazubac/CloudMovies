@@ -1,0 +1,14 @@
+
+<div class="example-container">
+    <h2 class="register-header">My notifications</h2>
+
+    
+    <div *ngFor="let not of this.notifications">
+      <div class="notification">
+        <p><strong>Content :</strong> {{ not.content }}</p>
+        <p><strong>Time :  </strong> {{ not.dateTime }}</p>
+      </div>
+    </div>
+    
+  </div>
+  

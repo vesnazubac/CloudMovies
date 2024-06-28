@@ -1,0 +1,100 @@
+<form [formGroup]="form">
+    <div  style="text-align: center;">
+        <h2 class="register-header" style="margin-top: 3%;">Request for accommodation : {{element?.name}}</h2>
+        <hr style="width: 50%; margin: 10px auto;">
+    
+          <div class="type-container">
+            <h2>Request id : {{requestId}}</h2>
+            <p><mat-label>Owner  : {{element?.ownerId}}</mat-label></p>
+            <mat-label>Type  : {{element?.type}}</mat-label>
+          </div>
+
+          <p></p>
+            <!-- <div class="data-container">
+            <h3>Location Data</h3>
+            <hr style="width: 50%; margin: 10px auto;">
+            <p><mat-label>Address : {{element?.location?.address}}</mat-label></p>
+            <p><mat-label>City : {{element?.location?.city}}</mat-label></p>
+            <p><mat-label>Country: {{element?.location?.country}}</mat-label></p>
+    
+              <mat-label>X coordinate : {{element?.location?.x}}  Y coordinate : {{element?.location?.y}}</mat-label>
+    
+        </div> -->
+          
+          <div class="guests-container">
+            <p style="margin-right: 10px;">
+                <mat-label>Min Guests number: {{element?.minGuests}}   Max Guests number : {{element?.maxGuests}}</mat-label>
+            </p>
+          </div>
+          
+          <p>
+              <mat-label>Cancellation Deadline : {{element?.cancellationDeadline}}</mat-label>
+          </p>
+          <p>
+              <mat-label>Description : {{element?.description}}</mat-label>
+          </p>
+
+          <div class="reservation-confirmation-container">
+            <mat-label>Reservation-confirmation : {{element?.reservationConfirmation}}</mat-label>
+        </div>
+          
+          <div class="options-container" style="text-align: center;margin-left: 28%;margin-top: 1%;">
+            <mat-chip-listbox aria-label="Accommodations amenities" multiple formControlName="amenities">
+              <mat-chip-option >Free Wi-Fi</mat-chip-option>
+              <mat-chip-option>Free Parking</mat-chip-option>
+              <mat-chip-option>Air conditioner</mat-chip-option>
+              <mat-chip-option>Kitchen</mat-chip-option>
+            </mat-chip-listbox>
+        </div>
+        
+        <div class="mat-elevation-z8">
+          <h2>Prices and availability intervals</h2>
+          <table mat-table [dataSource]="dataSource" matSort matPaginator #paginator>
+            
+            <ng-container matColumnDef="Id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+              <td mat-cell *matCellDef="let _element"> {{_element.id}} </td>
+            </ng-container>
+        
+            <ng-container matColumnDef="Start Date">
+              <th mat-header-cell *matHeaderCellDef> Start Date</th>
+              <td mat-cell *matCellDef="let _element"> 
+                {{_element.timeSlot.startDate | date: 'shortDate'}}
+              </td>
+            </ng-container>
+        
+            <ng-container matColumnDef="End Date">
+              <th mat-header-cell *matHeaderCellDef> End Date </th>
+              <td mat-cell *matCellDef="let _element"> {{_element.timeSlot.endDate | date: 'shortDate'}}</td>
+            </ng-container>
+        
+            <ng-container matColumnDef="Price">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Price </th>
+              <td mat-cell *matCellDef="let _element"> 
+                {{_element.price}}
+                </td>
+            </ng-container>
+            
+            <ng-container matColumnDef="Type">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Type </th>
+              <td mat-cell *matCellDef="let _element"> {{_element.type}} </td>
+            </ng-container>
+          
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+          <mat-paginator [pageSizeOptions]="[3,6]"
+                         showFirstLastButtons
+                         aria-label="Select page of periodic elements">
+          </mat-paginator>
+        </div>
+          
+    <div style="align-items: center; text-align: center;margin-top: 3%;">
+    <button (click)="approve()" mat-button  style="background-color: #1e88e5; color: white;font-size: 16px; margin-right: 100px; margin-bottom: 20px;">Approve Request</button>
+    <button (click)="reject()" mat-button  style="background-color: palevioletred; color: white;font-size: 16px;margin-bottom: 20px;">Reject Request</button>
+    </div>
+
+       
+      
+         
+         

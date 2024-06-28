@@ -1,0 +1,140 @@
+<div style="text-align: center;">
+<h2 class="register-header">Edit User Account</h2>
+<form [formGroup]="editAccountDataForm" (ngSubmit)="saveChanges()" >
+<p>
+  
+    <mat-form-field appearance="outline">
+      <input matInput placeholder="Name" formControlName="name" name="name">
+      <!-- <mat-error *ngIf="editAccountDataForm.get('name')?.hasError('required')">Name is required</mat-error> -->
+      <mat-icon matSuffix>edit_note</mat-icon>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field appearance="outline">
+      <input matInput placeholder="Lastname"  formControlName="surname" name="surname">
+      <!-- <mat-error *ngIf="editAccountDataForm.get('surname')?.hasError('required')">Surname is required</mat-error> -->
+      <mat-icon matSuffix>edit_note</mat-icon>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field appearance="outline">
+      <input matInput placeholder="pat@example.com" formControlName="username" name="username" readonly>
+      <mat-icon matSuffix>edit_note</mat-icon>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field fxFlex="100%">
+        <mat-label>Password</mat-label>
+        <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" name="password" required>
+        <!-- <mat-error *ngIf="editAccountDataForm.get('password')?.hasError('required')" id="errorPassword">Password is required</mat-error> -->
+        <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide.toString()">
+          <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field fxFlex="100%">
+        <mat-label>Password confirmation</mat-label>
+        <input matInput [type]="hide ? 'password' : 'text'"  formControlName="confirmPassword" name="confirmPassword" required>
+        <!-- <mat-error *ngIf="editAccountDataForm.get('confirmPassword')?.hasError('required')" id="errorConfirmationPassword">Confirm Password is required</mat-error>
+        <mat-error *ngIf="editAccountDataForm?.hasError('passwordMismatch')" id="errorPasswordMismatch">Passwords do not match</mat-error> -->
+        <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide.toString()">
+          <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field appearance="outline">
+      <input matInput placeholder="Address" formControlName="address" name="address">
+      <mat-icon matSuffix>edit_note</mat-icon>
+    </mat-form-field>
+  </p>
+  <p>
+    <mat-form-field appearance="outline">
+      <input matInput placeholder="Phone number" formControlName="phoneNumber" name="phoneNumber">
+      <mat-icon matSuffix>edit_note</mat-icon>
+    </mat-form-field>
+  </p>
+<p>
+
+
+<p>
+  <mat-form-field  appearance="outline" class="selection-class" >
+    <mat-label>Status</mat-label>
+    <mat-select name="status" formControlName="status" >
+      <mat-option value="DEACTIVE">DEACTIVE</mat-option>
+      <mat-option value="ACTIVE">ACTIVE</mat-option>
+    </mat-select>
+  </mat-form-field>
+  </p>
+
+
+<div class="slide-toggle-container">
+
+  <mat-slide-toggle formControlName="requestNotification" id="reservationRequestNotificationToggle"
+  class="example-margin"
+  [color]="color"
+  [checked]="checked"
+  [disabled]="disabled"
+  (change)="onSlideToggleChangeRequestNotification($event)">
+  
+Reservation Request Notification On!
+
+</mat-slide-toggle>
+
+  <mat-slide-toggle formControlName="cancellationNotification" id="cancellationNotification"
+      class="example-margin"
+      [color]="color"
+      [checked]="checked"
+      [disabled]="disabled"
+      (change)="onSlideToggleChangeCancellationNotification($event)">   
+    Reservation Cancellation Notification On!
+  </mat-slide-toggle>
+  
+  <mat-slide-toggle formControlName="ownerRatingNotification" id="ownerRatingNotificationToggle"
+  class="example-margin"
+  [color]="color"
+  [checked]="checked"
+  [disabled]="disabled"
+  (change)="onSlideToggleChangeOwnerRatingNotification($event)">   
+Owner Rating  Notification On!
+</mat-slide-toggle>
+
+  <mat-slide-toggle formControlName="accommodationRatingNotification"  id="accommodationRatingNotificationToggle"
+  class="example-margin"
+  [color]="color"
+  [checked]="checked"
+  [disabled]="disabled"
+  (change)="onSlideToggleChangeAccommodationRatingNotification($event)">   
+Accommodation Rating Notification On!
+</mat-slide-toggle>
+
+<mat-slide-toggle 
+class="example-margin" formControlName="ownerRepliedNotification"  id="ownerRepliedNotification"
+[color]="color"
+[checked]="checked"
+[disabled]="disabled"
+(change)="onSlideToggleChangeOwnerRepliedRequestNotification($event)">   
+Owner Replied To Reservation Request Notification On!
+</mat-slide-toggle>
+</div>
+
+</form>
+
+
+<div class="button-container">
+    <button mat-button id="saveButton" (click)="saveChanges()" style="background-color: #1e88e5; color: white; margin-right: 50px;"   [disabled]="!editAccountDataForm.valid">Save changes</button>
+    <button mat-fab background-color="red" id="deleteButton" (click)="delete()" aria-label="Example icon button with a delete icon">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+
+  <div *ngIf="editAccountDataForm.hasError('passwordMismatch')" class="error-message">
+    Passwords do not match.
+  </div>
+  
+  <div *ngIf="!isFormValid" class="error-message">
+    Input data are not valid!
+  </div>
+  
+</div>

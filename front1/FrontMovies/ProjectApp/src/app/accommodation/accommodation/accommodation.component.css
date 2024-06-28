@@ -1,0 +1,62 @@
+
+.custom-card {
+  background-color: #f0f0f0;
+  margin: 8px;
+  padding: 16px;
+  flex: 1 0 calc(25% - 20px); 
+  box-sizing: border-box;
+  height:100%;
+}
+mat-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height:100%;
+}
+img{
+  border: 1px solid black;
+  max-width: 100%;
+
+}
+b {
+  color: #333;
+  font-size: 1.2rem; 
+  margin-bottom: 10px; 
+}
+
+p {
+  color: #666; /* Change the color of regular text */
+  margin-bottom: 10px; /* Add space below paragraphs */
+}
+
+button {
+  background-color: #007bff; /* Blue color for the button */
+  color: #fff; /* White text on the button */
+  padding: 8px 16px; /* Adjust padding as needed */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker blue color on hover */
+}
+
+
+/* U vašem stilskom fajlu (npr. styles.css) */
+.custom-card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Senka */
+  border-radius: 8px; /* Zaobljeni rubovi */
+  border: 1px solid #ddd; /* Ivica */
+  overflow: hidden; /* Skrivanje ivica slike ako je veća od kartice */
+}
+
+.custom-card img {
+  max-width: 100%; /* Da bi se slika prilagodila širini kartice */
+  height: auto; /* Automatska visina kako bi se očuvali proporcije */
+}
+
+.custom-card button {
+  margin-top: 1%; 
+}

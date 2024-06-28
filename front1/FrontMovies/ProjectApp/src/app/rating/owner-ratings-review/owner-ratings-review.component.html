@@ -1,0 +1,30 @@
+<div class="example-container">
+    <h2 class="register-header">Ratings {{this.ownerId}}</h2>
+
+    
+    <div *ngFor="let review of this.ownersReviews">
+      <div class="review">
+        <p style="text-align: center;"><strong>Owner ID:</strong> {{ review.ownerId }}</p>
+        <!-- <p><strong>Reviewing </strong> {{ review.type }}</p> -->
+        <p></p>
+        <!-- <p>Request ID : {{review.id}}</p> -->
+        <p><strong>Comment:</strong> {{ review.comment }}</p>
+        <p><strong>Grade:</strong> {{ review.grade }}</p>
+        <p><strong>Rating created by :</strong> {{ review.userId }}</p>
+        <p><strong>Date:</strong> {{ review.dateTime | date:'medium' }}</p>
+        <p><strong>Status:</strong> {{ review.status}}</p>
+        <p></p>
+        <p><strong>Reported:</strong> 
+            <input type="checkbox" [checked]="review.reported" disabled 
+                   [ngClass]="{'reported-checkbox': review.reported}" />
+          </p>
+
+        <div class="button-container">
+            <button mat-raised-button color="primary" (click)="approveReview(review)">Approve review</button>
+            <button mat-raised-button color="warn" *ngIf="review.reported" (click)="rejectReview(review)">Delete review</button>
+          </div>
+       
+      </div>
+    </div>
+    
+  </div>
