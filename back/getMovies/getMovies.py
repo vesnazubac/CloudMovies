@@ -16,7 +16,25 @@ def lambda_handler(event, context):
     try:
         # Čitanje podataka iz tabele
         response = table.scan()
+
+        #items = response['Items']
         
+        # Dodavanje novog atributa svim stavkama
+        #for item in items:
+        #    table.update_item(
+        #        Key={
+        #            'id_filma': item['id_filma'],  # Zamenite sa stvarnim primarnim ključem
+        #            'naslov': item['naslov']
+        #        },
+        #        UpdateExpression="SET reziser = :reziser, glumci = :glumci",
+        #        ExpressionAttributeValues={
+        #            ':reziser': 'default_reziser',
+        #            ':glumci': 'default_glumac1,default_glumac2'
+        #        }
+        #    )
+
+        # Ponovno čitanje podataka iz tabele nakon ažuriranja
+        #response = table.scan()
         # Vraćanje odgovora sa podacima iz tabele
         return {
             'statusCode': 200,
