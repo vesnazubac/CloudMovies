@@ -56,7 +56,12 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 200,
-            'body': json.dumps(items)
+            'body': json.dumps(items),
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods':"GET,OPTIONS"
+            }
         }
     except Exception as e:
         # Log error
@@ -64,5 +69,10 @@ def lambda_handler(event, context):
         # Return error response
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': str(e)}),
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods':"GET,OPTIONS"
+            }
         }
