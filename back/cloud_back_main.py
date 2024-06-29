@@ -64,8 +64,35 @@ class CloudBackMain(Stack):
             )
         )
 
+       
+    
 
-           
+
+        app_client = cognito.UserPoolClient(
+            self, "MovieAppClient",
+            user_pool=user_pool,
+            auth_flows=cognito.AuthFlow(
+                user_password=True,
+                user_srp=True
+            ),
+            generate_secret=False,
+            o_auth={
+                'flows': {
+                    'implicit_code_grant': True,
+                    'authorization_code_grant': True
+                },
+                'callback_urls': [
+                    'http://localhost:4200'
+                ],
+                'logout_urls': [
+                    'http://localhost:4200'
+                ]
+            },
+            supported_identity_providers=[
+                cognito.UserPoolClientIdentityProvider.COGNITO
+            ]
+        )
+
 
 
         lambda_role = iam.Role(
