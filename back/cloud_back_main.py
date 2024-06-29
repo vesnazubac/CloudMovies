@@ -230,6 +230,14 @@ class CloudBackMain(Stack):
             "POST",  # method (pretpostavljamo da se koristi POST za registraciju)
             []
         )
+        search_movies_lambda_function = create_lambda_function(
+            "searchMovies",
+            "searchMoviesFunction",
+            "searchMovies.lambda_handler",
+            "searchMovies",
+            "GET",
+            []
+        )
 
         # # Dodavanje dozvola Lambda funkciji da poziva Cognito User Pool
         # user_pool.grant_sign_up(register_user_lambda_function)
@@ -265,10 +273,11 @@ class CloudBackMain(Stack):
 
         post_movies_integration = apigateway.LambdaIntegration(post_movie_lambda_function)
         get_movie_by_id_integration = apigateway.LambdaIntegration(get_movie_by_id_lambda_function)
+        search_movies_integration = apigateway.LambdaIntegration(search_movies_lambda_function)
         #Ova metoda kreira novi resurs movies. To znači da će URL za ovaj resurs biti /movies.
         #To znači da će se, kada API Gateway primi GET zahtev na /movies, pozvati get_movie_lambda_function.
         self.api.root.add_resource("movies").add_method("GET", get_movies_integration) #Ova metoda dodaje novi resurs pod nazivom movies na root nivou API-ja.
-
+        #self.api.root.add_resource("searchMovies").add_method("GET", search_movies_integration)
         #self.api.root("movies").add_method("POST", post_movies_integration)
            # Assume the movies resource already exists
         # moviesResource = self.api.root.get_resource("movies")
@@ -283,4 +292,5 @@ class CloudBackMain(Stack):
 
 
         self.api.root.add_resource("getMovie").add_method("GET", get_movie_by_id_integration)
+        self.api.root.add_resource("searchMovies").add_method("GET", search_movies_integration)
       
