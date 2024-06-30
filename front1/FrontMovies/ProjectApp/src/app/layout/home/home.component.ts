@@ -4,10 +4,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { AccommodationDataService } from 'src/app/accommodation/accommodation-data.service.module';
-import { AccommodationService } from 'src/app/accommodation/accommodation.service';
-import { Accommodation } from 'src/app/accommodation/accommodation/model/accommodation.model';
-import { AccommodationDetails } from 'src/app/accommodation/accommodation/model/accommodationDetails.model';
+import { MovieGetDTO } from 'src/app/models/movieGetDTO.model';
 import { environment } from 'src/env/env';
 
 @Component({
@@ -17,21 +14,11 @@ import { environment } from 'src/env/env';
  
 })
 export class HomeComponent {
-   accommodationList: Accommodation[] = []
+   moviesList: MovieGetDTO[] = []
 
-
-   searchedAccommodations: AccommodationDetails[] | undefined
-   constructor(private service: AccommodationService, private snackBar:MatSnackBar, private fb: FormBuilder,
-    private dataService: AccommodationDataService,private router: Router,private http: HttpClient) {
+   constructor( private snackBar:MatSnackBar, private fb: FormBuilder,private router: Router,private http: HttpClient) {
   }
   ngOnInit(): void {
-
-    this.service.getAllApproved().subscribe({
-       next: (data: Accommodation[]) => {
-        this.accommodationList = data
-       },
-      error: (_) => {console.log("Greska!")}
-     })
   }
   searchMoviesForm = this.fb.group({
     title: [''],
@@ -48,7 +35,7 @@ export class HomeComponent {
   }
   
 
-  searchAccommodations() {
+  searchMovies() {
 
     const title = this.searchMoviesForm.get('title')?.value;
     const description = this.searchMoviesForm.get('description')?.value;
@@ -69,10 +56,18 @@ export class HomeComponent {
       this.http.get(url, { params }).subscribe({
         next: (data: any) => {
           console.log('Rezultati pretrage:', data);
-          // Ažuriranje rezultata u servisu ako je potrebno
-          // this.dataService.updateSearchedAccommodations(data);
-          // Navigacija na željenu stranicu
-          // this.router.navigate(['/searched-accommodation-cards']);
+
+          this.moviesList = data.map((item: any) => ({
+            id_filma: item.id_filma,
+            rezolucija: item.rezolucija,
+            zanr: item.zanr,
+            trajanje: item.trajanje,
+            naslov: item.naslov,
+            opis: item.opis,
+            reziser: item.reziser,
+            glumci: item.glumci,
+          }));
+          console.log('Converted Movies:', this.moviesList);
         },
         error: (error) => {
           console.error('Greška pri dohvatanju podataka:', error);

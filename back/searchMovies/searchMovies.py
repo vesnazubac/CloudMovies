@@ -28,16 +28,28 @@ def lambda_handler(event, context):
             filter_expression = Attr('naslov').contains(naslov)
         
         if opis:
-            filter_expression &= Attr('opis').contains(opis) if filter_expression else Attr('opis').contains(opis)
+            if filter_expression:
+                filter_expression &= Attr('opis').contains(opis)
+            else:
+                filter_expression = Attr('opis').contains(opis)
         
         if glumci:
-            filter_expression &= Attr('glumci').contains(glumci) if filter_expression else Attr('glumci').contains(glumci)
+            if filter_expression:
+                filter_expression &= Attr('glumci').contains(glumci)
+            else:
+                filter_expression = Attr('glumci').contains(glumci)
         
         if reziser:
-            filter_expression &= Attr('reziser').contains(reziser) if filter_expression else Attr('reziser').contains(reziser)
+            if filter_expression:
+                filter_expression &= Attr('reziser').contains(reziser)
+            else:
+                filter_expression = Attr('reziser').contains(reziser)
         
         if zanr:
-            filter_expression &= Attr('zanr').contains(zanr) if filter_expression else Attr('zanr').contains(zanr)
+            if filter_expression:
+                filter_expression &= Attr('zanr').contains(zanr)
+            else:
+                filter_expression = Attr('zanr').contains(zanr)
         
         # Perform query
         if filter_expression:
@@ -51,9 +63,7 @@ def lambda_handler(event, context):
         print(f"DynamoDB response: {response}")
 
         items = response.get('Items', [])
-        if not items:
-            raise ValueError("No movies found")
-
+        
         return {
             'statusCode': 200,
             'body': json.dumps(items),

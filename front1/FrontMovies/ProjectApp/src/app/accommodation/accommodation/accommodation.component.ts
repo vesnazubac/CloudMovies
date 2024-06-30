@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Accommodation } from './model/accommodation.model';
+import { MovieGetDTO } from 'src/app/models/movieGetDTO.model';
 
 
 @Component({
@@ -9,7 +10,7 @@ import { Accommodation } from './model/accommodation.model';
 })
 export class AccommodationComponent {
   @Input() 
-  accommodation:Accommodation;
+  movie:MovieGetDTO;
   truncateDescription(description: string, words: number): string {
     const wordArray = description.split(' ');
     if (wordArray.length > words) {

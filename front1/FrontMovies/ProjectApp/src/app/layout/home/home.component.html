@@ -34,12 +34,12 @@
 
     
 
-    <button id="searchBtn" (click)="searchAccommodations()" mat-button style="background-color: #1e88e5; color: white;margin-top: 4%;">Search</button>
+    <button id="searchBtn" (click)="searchMovies()" mat-button style="background-color: #1e88e5; color: white;margin-top: 4%;">Search</button>
   </div>
 </form>
 <div class="card-container">
-    <div *ngFor="let accommodation of accommodationList" style="margin-bottom: 2%;margin-top: 1%;">
-      <app-accommodation [accommodation]="accommodation"></app-accommodation>
+    <div *ngFor="let movie of moviesList" style="margin-bottom: 2%;margin-top: 1%;">
+      <app-accommodation [movie]="movie"></app-accommodation>
     </div>
   </div>
   

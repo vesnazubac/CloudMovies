@@ -1,62 +1,61 @@
-
 .custom-card {
   background-color: #f0f0f0;
   margin: 8px;
   padding: 16px;
-  flex: 1 0 calc(25% - 20px); 
+  flex: 1 0 calc(25% - 20px);
   box-sizing: border-box;
-  height:100%;
-}
-mat-card-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height:100%;
-}
-img{
-  border: 1px solid black;
-  max-width: 100%;
-
-}
-b {
-  color: #333;
-  font-size: 1.2rem; 
-  margin-bottom: 10px; 
-}
-
-p {
-  color: #666; /* Change the color of regular text */
-  margin-bottom: 10px; /* Add space below paragraphs */
-}
-
-button {
-  background-color: #007bff; /* Blue color for the button */
-  color: #fff; /* White text on the button */
-  padding: 8px 16px; /* Adjust padding as needed */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease; /* Smooth transition on hover */
-}
-
-button:hover {
-  background-color: #0056b3; /* Darker blue color on hover */
-}
-
-
-/* U vašem stilskom fajlu (npr. styles.css) */
-.custom-card {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Senka */
-  border-radius: 8px; /* Zaobljeni rubovi */
-  border: 1px solid #ddd; /* Ivica */
+  height: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid #ddd;
   overflow: hidden; /* Skrivanje ivica slike ako je veća od kartice */
 }
 
-.custom-card img {
-  max-width: 100%; /* Da bi se slika prilagodila širini kartice */
-  height: auto; /* Automatska visina kako bi se očuvali proporcije */
+mat-card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-align: left; 
+  max-width: 300px; /* Postavljanje maksimalne širine kartice */
 }
 
-.custom-card button {
-  margin-top: 1%; 
+.movie-image {
+  width: auto; /* Slika će zauzeti maksimalnu širinu kartice */
+  height: auto;
+  max-height: 200px; /* Maksimalna visina slike */
+  border: 1px solid black;
+}
+.imagee{
+  display: flex;
+  justify-content: center; /* Centrira sliku horizontalno */
+  margin-bottom: 10px;
+}
+
+.movie-description, .movie-director, .movie-actors {
+  color: #666; /* Promena boje teksta */
+  margin-bottom: 10px; /* Razmak ispod paragrafa */
+  max-width: 100%; /* Ograničavanje širine teksta */
+  word-wrap: break-word; /* Razbijanje dugih reči */
+  white-space: pre-wrap; /* Omogućava prelazak u novi red */
+  overflow-wrap: break-word; /* Prelom reči pri prekoračenju granica */
+}
+
+button {
+  background-color: #007bff; /* Plava boja dugmeta */
+  color: #fff; /* Bela boja teksta na dugmetu */
+  padding: 8px 16px; /* Podešavanje paddinga po potrebi */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Glatka tranzicija pri hoveru */
+  margin-top: 1%;
+}
+
+button:hover {
+  background-color: #0056b3; /* Tamnija plava boja pri hoveru */
+}
+
+h2 {
+  word-wrap: break-word; /* Razbijanje dugih reči u naslovu */
+  max-width: 100%; /* Ograničavanje širine naslova */
 }
