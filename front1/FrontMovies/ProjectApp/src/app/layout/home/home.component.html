@@ -1,10 +1,29 @@
-<form [formGroup]="searchAccommodationForm">
+<form [formGroup]="searchMoviesForm">
   <div class="data-container">
     <h2 class="register-header">Search for a movie</h2>
     <mat-form-field appearance="outline">
-      <mat-label>City:</mat-label>
-      <input matInput placeholder="Name:" formControlName="city">
-      <mat-error *ngIf="searchAccommodationForm.get('city')?.hasError('required')">This field is required</mat-error>
+      <mat-label>Title:</mat-label>
+      <input matInput placeholder="Name:" formControlName="title">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description:</mat-label>
+      <input matInput placeholder="Description:" formControlName="description">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Genre:</mat-label>
+      <input matInput placeholder="Genre:" formControlName="genre">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Director:</mat-label>
+      <input matInput placeholder="Director:" formControlName="director">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Actors:</mat-label>
+      <input matInput placeholder="Actors:" formControlName="actors">
     </mat-form-field>
 <!-- 
     <mat-form-field appearance="outline">
@@ -15,12 +34,12 @@
 
     
 
-    <button id="searchBtn" (click)="searchAccommodations()" mat-button style="background-color: #1e88e5; color: white;margin-top: 4%;">Search</button>
+    <button id="searchBtn" (click)="searchMovies()" mat-button style="background-color: #1e88e5; color: white;margin-top: 4%;">Search</button>
   </div>
 </form>
 <div class="card-container">
-    <div *ngFor="let accommodation of accommodationList" style="margin-bottom: 2%;margin-top: 1%;">
-      <app-accommodation [accommodation]="accommodation"></app-accommodation>
+    <div *ngFor="let movie of moviesList" style="margin-bottom: 2%;margin-top: 1%;">
+      <app-accommodation [movie]="movie"></app-accommodation>
     </div>
   </div>
   

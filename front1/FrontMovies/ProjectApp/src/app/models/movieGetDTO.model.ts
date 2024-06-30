@@ -5,4 +5,6 @@ export interface MovieGetDTO {
     trajanje: string;
     naslov: string;
     opis: string;
+    reziser: string;
+    glumci: string;
 }
