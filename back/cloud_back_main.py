@@ -36,7 +36,11 @@ class CloudBackMain(Stack):
             self, 'TabelaFilmova',
             table_name='TabelaFilmova'  # Ime postojeće DynamoDB tabele
         )
-
+        # Reference to the search table
+        search_table = dynamodb.Table.from_table_name(
+            self, 'SearchMoviesTable',
+            table_name='SearchMoviesTable'
+        )
           # Kreiranje S3 bucketa
         bucket = s3.Bucket(self, "moviesbucket",
                            removal_policy=RemovalPolicy.DESTROY,  # Za razvojno okruženje, uklonite za produkciju
@@ -158,6 +162,7 @@ class CloudBackMain(Stack):
                 timeout=Duration.seconds(10),
                 environment={
                     'TABLE_NAME': table.table_name,
+                    'SEARCH_TABLE_NAME': search_table.table_name,
                     'BUCKET_NAME': bucket.bucket_name,
                     'USER_POOL_ID':user_pool.user_pool_id,
                     
@@ -247,6 +252,7 @@ class CloudBackMain(Stack):
         
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
+        
 
         table.grant_write_data(post_movie_lambda_function)
         bucket.add_to_resource_policy(iam.PolicyStatement(
@@ -261,6 +267,7 @@ class CloudBackMain(Stack):
         bucket.grant_put(post_movie_lambda_function)
         bucket.grant_write(post_movie_lambda_function)
         bucket.grant_read(get_movie_by_id_lambda_function)
+        search_table.grant_read_data(search_movies_lambda_function)
 
         register_user_integration = apigateway.LambdaIntegration(register_user_lambda_function)
         self.api.root.add_resource("registerUser").add_method("POST", register_user_integration)

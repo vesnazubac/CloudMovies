@@ -59,13 +59,13 @@ export class HomeComponent {
 
           this.moviesList = data.map((item: any) => ({
             id_filma: item.id_filma,
-            rezolucija: item.rezolucija,
-            zanr: item.zanr,
-            trajanje: item.trajanje,
-            naslov: item.naslov,
-            opis: item.opis,
-            reziser: item.reziser,
-            glumci: item.glumci,
+            rezolucija: item.movie_data.split('|')[4],
+            zanr: item.movie_data.split('|')[6],
+            trajanje: item.movie_data.split('|')[5],
+            naslov: item.movie_data.split('|')[0],
+            opis: item.movie_data.split('|')[2],
+            reziser: item.movie_data.split('|')[3],
+            glumci: item.movie_data.split('|')[1],
           }));
           console.log('Converted Movies:', this.moviesList);
         },

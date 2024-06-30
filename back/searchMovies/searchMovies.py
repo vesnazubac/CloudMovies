@@ -3,7 +3,7 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource('dynamodb')
-table_name = 'TabelaFilmova'
+table_name = 'SearchMoviesTable'
 table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
@@ -15,15 +15,40 @@ def lambda_handler(event, context):
         query_params = event.get('queryStringParameters', {})
         
         # Define possible query parameters
-        naslov = query_params.get('naslov', '')
-        opis = query_params.get('opis', '')
-        glumci = query_params.get('glumci', '')
-        reziser = query_params.get('reziser', '')
-        zanr = query_params.get('zanr', '')
+        naslov = query_params.get('naslov', '').lower()
+        opis = query_params.get('opis', '').lower()
+        glumci = query_params.get('glumci', '').lower()
+        reziser = query_params.get('reziser', '').lower()
+        zanr = query_params.get('zanr', '').lower()
 
         # Build the filter expression dynamically
         filter_expression = None
-        
+
+        response = table.scan()
+        items = response.get('Items', [])
+
+        # Filter items based on query parameters
+        filtered_items = []
+        for item in items:
+            movie_data = item['movie_data'].lower()
+            movie_parts = movie_data.split('|')
+            
+            if (naslov in movie_parts[0] and
+                glumci in movie_parts[1] and
+                opis in movie_parts[2] and
+                reziser in movie_parts[3] and
+                zanr in movie_parts[6]):
+                filtered_items.append(item)
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps(filtered_items),
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods':"GET,OPTIONS"
+            }}
+
         if naslov:
             filter_expression = Attr('naslov').contains(naslov)
         
