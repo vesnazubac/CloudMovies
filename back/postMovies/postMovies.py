@@ -213,6 +213,8 @@ def lambda_handler(event, context):
         zanr = body.get('zanr')
         rezolucija = body.get('rezolucija')
         opis = body.get('opis')
+        glumci = body.get('glumci')
+        reziser = body.get('reziser')
         video_data = body.get('video_data')  # Base64 encoded video
         
         # Validate required fields
@@ -228,7 +230,10 @@ def lambda_handler(event, context):
                 'trajanje': trajanje,
                 'zanr': zanr,
                 'rezolucija': rezolucija,
-                'opis': opis
+                'glumci': glumci,
+                'reziser': reziser,
+                'opis': opis,
+                'combined_key':f"{naslov}|{glumci}|{opis}|{reziser}|{zanr}"
             }
         )
         
