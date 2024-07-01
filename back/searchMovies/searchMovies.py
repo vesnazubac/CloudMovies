@@ -3,7 +3,7 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource('dynamodb')
-table_name = 'SearchMoviesTable'
+table_name = 'TabelaFilmova'
 table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
@@ -15,87 +15,74 @@ def lambda_handler(event, context):
         query_params = event.get('queryStringParameters', {})
         
         # Define possible query parameters
-        naslov = query_params.get('naslov', '').lower()
-        opis = query_params.get('opis', '').lower()
-        glumci = query_params.get('glumci', '').lower()
-        reziser = query_params.get('reziser', '').lower()
-        zanr = query_params.get('zanr', '').lower()
+        naslov = query_params.get('naslov', '')
+        opis = query_params.get('opis', '')
+        glumci = query_params.get('glumci', '')
+        reziser = query_params.get('reziser', '')
+        zanr = query_params.get('zanr', '')
 
-        # Build the filter expression dynamically
-        filter_expression = None
+        # Check if all parameters are present and not empty
+        use_query = all([naslov, opis, glumci, reziser, zanr])
 
-        response = table.scan()
-        items = response.get('Items', [])
-
-        # Filter items based on query parameters
-        filtered_items = []
-        for item in items:
-            movie_data = item['movie_data'].lower()
-            movie_parts = movie_data.split('|')
-            
-            if (naslov in movie_parts[0] and
-                glumci in movie_parts[1] and
-                opis in movie_parts[2] and
-                reziser in movie_parts[3] and
-                zanr in movie_parts[6]):
-                filtered_items.append(item)
-
-        return {
-            'statusCode': 200,
-            'body': json.dumps(filtered_items),
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': True,
-                'Access-Control-Allow-Methods':"GET,OPTIONS"
-            }}
-
-        if naslov:
-            filter_expression = Attr('naslov').contains(naslov)
-        
-        if opis:
-            if filter_expression:
-                filter_expression &= Attr('opis').contains(opis)
-            else:
-                filter_expression = Attr('opis').contains(opis)
-        
-        if glumci:
-            if filter_expression:
-                filter_expression &= Attr('glumci').contains(glumci)
-            else:
-                filter_expression = Attr('glumci').contains(glumci)
-        
-        if reziser:
-            if filter_expression:
-                filter_expression &= Attr('reziser').contains(reziser)
-            else:
-                filter_expression = Attr('reziser').contains(reziser)
-        
-        if zanr:
-            if filter_expression:
-                filter_expression &= Attr('zanr').contains(zanr)
-            else:
-                filter_expression = Attr('zanr').contains(zanr)
-        
-        # Perform query
-        if filter_expression:
-            response = table.scan(
-                FilterExpression=filter_expression
+        if use_query:
+            # Build KeyConditionExpression for query
+            combined_key = f"{naslov}|{glumci}|{opis}|{reziser}|{zanr}"
+            response = table.query(
+                IndexName='combined_key-index',
+                KeyConditionExpression=Key('combined_key').eq(combined_key)
             )
+            items = response.get('Items', [])
         else:
-            response = table.scan()
+            # Perform scan with FilterExpression
+            filter_expression = None
+            
+            if naslov:
+                filter_expression = Attr('naslov').contains(naslov)
+            
+            if opis:
+                if filter_expression:
+                    filter_expression &= Attr('opis').contains(opis)
+                else:
+                    filter_expression = Attr('opis').contains(opis)
+            
+            if glumci:
+                if filter_expression:
+                    filter_expression &= Attr('glumci').contains(glumci)
+                else:
+                    filter_expression = Attr('glumci').contains(glumci)
+            
+            if reziser:
+                if filter_expression:
+                    filter_expression &= Attr('reziser').contains(reziser)
+                else:
+                    filter_expression = Attr('reziser').contains(reziser)
+            
+            if zanr:
+                if filter_expression:
+                    filter_expression &= Attr('zanr').contains(zanr)
+                else:
+                    filter_expression = Attr('zanr').contains(zanr)
+            
+            # Perform scan with FilterExpression
+            if filter_expression:
+                response = table.scan(
+                    FilterExpression=filter_expression
+                )
+            else:
+                response = table.scan()
+
+            items = response.get('Items', [])
 
         # Log response for debugging
         print(f"DynamoDB response: {response}")
 
-        items = response.get('Items', [])
-        
         return {
             'statusCode': 200,
             'body': json.dumps(items),
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True,
-                'Access-Control-Allow-Methods':"GET,OPTIONS"
+                'Access-Control-Allow-Methods': "GET,OPTIONS"
             }
         }
     except Exception as e:
@@ -108,6 +95,6 @@ def lambda_handler(event, context):
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True,
-                'Access-Control-Allow-Methods':"GET,OPTIONS"
+                'Access-Control-Allow-Methods': "GET,OPTIONS"
             }
         }
