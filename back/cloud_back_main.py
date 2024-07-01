@@ -15,7 +15,7 @@ from aws_cdk import (
 
 )
 from constructs import Construct
-
+import boto3
 
 
 class CloudBackMain(Stack):
@@ -67,6 +67,79 @@ class CloudBackMain(Stack):
                 email=cognito.StandardAttribute(required=True)
             )
         )
+
+
+        # Kreiranje grupe za administratore
+        admin_group = cognito.CfnUserPoolGroup(
+            self, "AdminGroup",
+            user_pool_id=user_pool.user_pool_id,
+            group_name="Admins",
+            description="Administrative users group")
+        
+        # Kreiranje grupe za korisnike
+        user_group = cognito.CfnUserPoolGroup(
+            self, "UserGroup",
+            user_pool_id=user_pool.user_pool_id,
+            group_name="Users",
+            description="Users group")
+        
+        # Definisanje IAM role za administratore
+        admin_role = iam.Role(
+            self, "AdminRole",
+            assumed_by=iam.FederatedPrincipal(
+                "cognito-identity.amazonaws.com",
+                {
+                    "StringEquals": {
+                        "cognito-identity.amazonaws.com:aud": user_pool.user_pool_id
+                    },
+                    "ForAnyValue:StringLike": {
+                        "cognito-identity.amazonaws.com:amr": "authenticated"
+                    }
+                },
+                "sts:AssumeRoleWithWebIdentity"))
+        
+        # Definicija IAM uloge za običnog korisnika
+        user_role = iam.Role(
+            self, "UserRole",
+            assumed_by=iam.FederatedPrincipal(
+                "cognito-identity.amazonaws.com",
+                {
+                    "StringEquals": {
+                        "cognito-identity.amazonaws.com:aud": user_pool.user_pool_id
+                    },
+                    "ForAnyValue:StringLike": {
+                        "cognito-identity.amazonaws.com:amr": "authenticated"
+                    }
+                },
+                "sts:AssumeRoleWithWebIdentity"
+            )
+        )
+
+        # Dodavanje dozvola IAM ulozi za običnog korisnika
+        user_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "dynamodb:GetItem",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "s3:GetObject",
+                    "s3:ListBucket"
+                ],
+                resources=[
+                    table.table_arn,
+                    f"{bucket.bucket_arn}/*"]))
+                
+        admin_role.add_to_policy(iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["s3:PutObject"],
+            resources=[f"{bucket.bucket_arn}/*"]))
+
+        #Dodavanje role na grupu
+        admin_group.role_arn = admin_role.role_arn
+        user_group.role_arn = user_role.role_arn
+     
+
 
        
     
@@ -127,13 +200,16 @@ class CloudBackMain(Stack):
                     "cognito-idp:InitiateAuth",  # Dozvola za inicijaciju autentifikacije
                      "cognito-idp:RespondToAuthChallenge",  # Dozvola za odgovaranje na autentifikacioni izazov
                     "cognito-idp:AdminGetUser",  # Dozvola za dobijanje podataka o korisniku preko Admin API-ja
-                    "cognito-idp:GlobalSignOut"  # Dozvola za globalan odjavljivanje korisnika
+                    "cognito-idp:GlobalSignOut",  # Dozvola za globalan odjavljivanje korisnika
+                    "cognito-idp:AdminAddUserToGroup",
+                    "cognito-idp:AdminListGroupsForUser"
                 ],
                 # resources=[table.table_arn]
                  resources=[
                     table.table_arn,
                     f"{bucket.bucket_arn}/*",
-                    user_pool.user_pool_arn
+                    user_pool.user_pool_arn,
+                     f"arn:aws:cognito-idp:{self.region}:{self.account}:userpool/{user_pool.user_pool_id}"
                    
                     
                     
@@ -210,6 +286,15 @@ class CloudBackMain(Stack):
             []  # layers
         )
 
+        add_user_to_group_lambda_function = create_lambda_function(
+            "addUserToGroup",  # id
+            "addUserToGroupFunction",  # name
+            "addUserToGroup.lambda_handler",  # handler
+            "addUserToGroup",  # include_dir
+            "POST",  # method
+            []
+        )
+
      
 
 
@@ -275,6 +360,9 @@ class CloudBackMain(Stack):
         login_user_integration = apigateway.LambdaIntegration(login_user_lambda_function)
         self.api.root.add_resource("loginUser").add_method("POST", login_user_integration)
 
+        add_user_to_group_integration = apigateway.LambdaIntegration(add_user_to_group_lambda_function)
+        self.api.root.add_resource("addUserToGroup").add_method("POST", add_user_to_group_integration)
+
        
         get_movies_integration = apigateway.LambdaIntegration(get_movie_lambda_function) #integracija izmedju lambda fje i API gateway-a, sto znaci da API Gateway može pozivati Lambda funkciju kao odgovor na HTTP zahteve. 
 
@@ -300,4 +388,3 @@ class CloudBackMain(Stack):
 
         self.api.root.add_resource("getMovie").add_method("GET", get_movie_by_id_integration)
         self.api.root.add_resource("searchMovies").add_method("GET", search_movies_integration)
-      

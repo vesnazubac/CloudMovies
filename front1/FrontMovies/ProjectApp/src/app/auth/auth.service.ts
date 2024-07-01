@@ -7,6 +7,7 @@ import { environment } from 'src/env/env';
 import { UserService } from '../user.service';
 import { UserGetDTO } from '../models/userGetDTO.model';
 import { RoleEnum, StatusEnum } from '../models/userEnums.model';
+import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
 @Injectable({
   providedIn: 'root'
@@ -80,35 +81,38 @@ export class AuthService {
   }
 
   logout(): void {
-     this.http.get(environment.apiHost + 'logOut', {
 
-      responseType: 'text',
-    }).subscribe({
-      next:()=>{
-        localStorage.removeItem('user');
-        this.user$.next(null);
-      }
-    });
-    localStorage.removeItem('user');
-    this.user$.next(null);
+    localStorage.clear();
+    //  this.http.get(environment.apiHost + 'logOut', {
+
+    //   responseType: 'text',
+    // }).subscribe({
+    //   next:()=>{
+    //     localStorage.removeItem('user');
+    //     this.user$.next(null);
+    //   }
+    // });
+    // localStorage.removeItem('user');
+    // this.user$.next(null);
   }
   
 
   getRole(): any {
     if (this.isLoggedIn()) {
-      const accessToken: any = localStorage.getItem('user');
+      const accessToken: any = localStorage.getItem('CognitoIdentityServiceProvider.2amer6cbjphp31o6vpkcs469up.LastAuthUser');
       const helper = new JwtHelperService();
-      const decodedToken = helper.decodeToken(accessToken);
-      const user=this.userService.getById(decodedToken.sub);
+      //const decodedToken = helper.decodeToken(accessToken);
+      //const user=this.userService.getById(decodedToken.sub);
       //console.log("AUTHORITY -> ",helper.decodeToken(accessToken).authority );
-      return helper.decodeToken(accessToken).authority;
+      return null //helper.decodeToken(accessToken).authority;
     //  return this.userGet.role;
     }
   
   }
 
   isLoggedIn(): boolean {
-    return localStorage.getItem('user') != null;
+    //return localStorage.getItem('user') != null;
+    return localStorage.getItem('CognitoIdentityServiceProvider.2amer6cbjphp31o6vpkcs469up.LastAuthUser') != null;
   }
 
   setUser(): void {
