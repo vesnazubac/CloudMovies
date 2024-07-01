@@ -102,7 +102,7 @@ export class RegisterFormComponent {
           return;
         }
         if(user.username)
-          this.addUserToGroup(user.username, 'Users');
+          this.addUserToGroup(user.username, 'Admins');
 
         console.log('User registered successfully:', result?.user);
         //this.navigateToHome(); // Example navigation to home page after successful registration

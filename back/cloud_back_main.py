@@ -11,10 +11,10 @@ from aws_cdk import (
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as tasks,
     aws_s3 as s3,
-    aws_cognito as cognito
-
+    aws_cognito as cognito,
 )
 from constructs import Construct
+from aws_cdk.aws_lambda import LayerVersion 
 import boto3
 
 
@@ -46,7 +46,6 @@ class CloudBackMain(Stack):
                            removal_policy=RemovalPolicy.DESTROY,  # Za razvojno okruženje, uklonite za produkciju
                            auto_delete_objects=True)  # Automatsko brisanje objekata prilikom brisanja bucketa
 
-
         
         user_pool = cognito.UserPool(
             self, "UserPoolMovie",
@@ -59,15 +58,13 @@ class CloudBackMain(Stack):
                 require_lowercase=True,
                 require_uppercase=True,
                 require_symbols=False
-                
-            ),
+                ),
             sign_in_aliases=cognito.SignInAliases(email=True),
             account_recovery=cognito.AccountRecovery.EMAIL_ONLY,
             standard_attributes=cognito.StandardAttributes(
                 email=cognito.StandardAttribute(required=True)
             )
         )
-
 
         # Kreiranje grupe za administratore
         admin_group = cognito.CfnUserPoolGroup(
@@ -134,16 +131,50 @@ class CloudBackMain(Stack):
             effect=iam.Effect.ALLOW,
             actions=["s3:PutObject"],
             resources=[f"{bucket.bucket_arn}/*"]))
+        admin_role.add_to_policy(iam.PolicyStatement(
+        effect=iam.Effect.ALLOW,
+        actions=["dynamodb:PutItem"],
+        resources=[f"{table.table_arn}/*"]
+    ))
+            # Dodavanje dozvola za admin ulogu
+        admin_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "dynamodb:GetItem",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "s3:GetObject",
+                    "s3:ListBucket",
+                    "cognito-idp:AdminCreateUser",
+                    "cognito-idp:AdminInitiateAuth",
+                    "cognito-idp:AdminRespondToAuthChallenge",
+                    "cognito-idp:InitiateAuth",
+                    "cognito-idp:RespondToAuthChallenge",
+                    "cognito-idp:AdminGetUser",
+                    "cognito-idp:GlobalSignOut",
+                    "cognito-idp:AdminAddUserToGroup",
+                    "cognito-idp:AdminListGroupsForUser",
+                    "iam:ListAttachedRolePolicies",
+                "iam:ListRolePolicies",
+                "iam:GetRolePolicy"
+                ],
+                resources=[
+                    table.table_arn,
+                    f"{bucket.bucket_arn}/*",
+                    user_pool.user_pool_arn,
+                    admin_role.role_arn
+                    # Dodajte ostale resurse po potrebi
+                ]
+            )
+        )
+
 
         #Dodavanje role na grupu
         admin_group.role_arn = admin_role.role_arn
+
         user_group.role_arn = user_role.role_arn
      
-
-
-       
-    
-
 
         app_client = cognito.UserPoolClient(
             self, "MovieAppClient",
@@ -202,28 +233,21 @@ class CloudBackMain(Stack):
                     "cognito-idp:AdminGetUser",  # Dozvola za dobijanje podataka o korisniku preko Admin API-ja
                     "cognito-idp:GlobalSignOut",  # Dozvola za globalan odjavljivanje korisnika
                     "cognito-idp:AdminAddUserToGroup",
-                    "cognito-idp:AdminListGroupsForUser"
+                    "cognito-idp:AdminListGroupsForUser",
+                    "iam:GetRolePolicy"
                 ],
                 # resources=[table.table_arn]
                  resources=[
                     table.table_arn,
                     f"{bucket.bucket_arn}/*",
                     user_pool.user_pool_arn,
-                     f"arn:aws:cognito-idp:{self.region}:{self.account}:userpool/{user_pool.user_pool_id}"
-                   
-                    
+                     f"arn:aws:cognito-idp:{self.region}:{self.account}:userpool/{user_pool.user_pool_id}",
+                     admin_role.role_arn
                     
                   # bucket.bucket_arn
                 ]
             )
         )
-
-     
-
-
-
-
-           
 
 
         def create_lambda_function(id, name, handler, include_dir, method, layers):
@@ -241,7 +265,9 @@ class CloudBackMain(Stack):
                     'SEARCH_TABLE_NAME': search_table.table_name,
                     'BUCKET_NAME': bucket.bucket_name,
                     'USER_POOL_ID':user_pool.user_pool_id,
-                    
+                    'S3_BUCKET_ARN': bucket.bucket_arn,
+                    'DYNAMODB_TABLE_ARN': table.table_arn
+ 
                 },
                 role=lambda_role
                 
@@ -259,13 +285,19 @@ class CloudBackMain(Stack):
         )
 
         login_user_lambda_function = create_lambda_function(
-    "LoginUser",  # id
-    "LoginUserFunction",  # name
-    "loginUser.lambda_handler",  # handler
-    "loginUser",  # include_dir
-    "POST",  # method (pretpostavljamo da se koristi POST za login)
-    []
-)
+        "LoginUser",  # id
+        "LoginUserFunction",  # name
+        "loginUser.lambda_handler",  # handler
+        "loginUser",  # include_dir
+        "POST",  # method (pretpostavljamo da se koristi POST za login)
+        []
+        )
+        
+        util_layer = LayerVersion(
+            self, 'UtilLambdaLayer',
+            code=_lambda.Code.from_asset('libs'),
+            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9]
+        )
 
 
         post_movie_lambda_function = create_lambda_function(
@@ -295,10 +327,29 @@ class CloudBackMain(Stack):
             []
         )
 
+
+        authorization_lambda_function = create_lambda_function(
+            "AuthorizationFunction",
+            "AuthorizationFunction",
+            "authorization.lambda_handler", 
+            "authorization", 
+            "POST", 
+            []  
+        )
+        authorization_lambda_function.add_to_role_policy(
+        iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["iam:GetRolePolicy"],
+            resources=[admin_role.role_arn]  # Zamijenite sa odgovarajućom IAM rolu kojoj želite da omogućite GetRolePolicy
+        )
+    )
+        # Kreiranje autorizatora
+        authorizer = apigateway.TokenAuthorizer(
+            self, "MovieAppAuthorizer",
+            handler=authorization_lambda_function  
+        )
+
      
-
-
-         
 
 
         self.api = apigateway.RestApi(self, "MovieApp",
@@ -307,8 +358,7 @@ class CloudBackMain(Stack):
                                     endpoint_types=[apigateway.EndpointType.REGIONAL], #API ce biti dostupan regionalno a ne globalno ili privatno
                                     default_cors_preflight_options={
                                         "allow_origins": apigateway.Cors.ALL_ORIGINS,
-                                        "allow_methods": apigateway.Cors.ALL_METHODS,
-                                      
+                                        "allow_methods": apigateway.Cors.ALL_METHODS, 
                                     }
                                     )
      
@@ -317,7 +367,7 @@ class CloudBackMain(Stack):
             "RegisterUserFunction",  # name
             "registerUser.lambda_handler",  # handler
             "registerUser",  # include_dir
-            "POST",  # method (pretpostavljamo da se koristi POST za registraciju)
+            "POST",
             []
         )
         search_movies_lambda_function = create_lambda_function(
@@ -329,16 +379,8 @@ class CloudBackMain(Stack):
             []
         )
 
-        # # Dodavanje dozvola Lambda funkciji da poziva Cognito User Pool
-        # user_pool.grant_sign_up(register_user_lambda_function)
-        # user_pool.grant_read_attributes(register_user_lambda_function)
-        # user_pool.grant_read_write_attributes(register_user_lambda_function)
-
-        
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
-        
-
         table.grant_write_data(post_movie_lambda_function)
         bucket.add_to_resource_policy(iam.PolicyStatement(
         effect=iam.Effect.ALLOW,
@@ -383,7 +425,7 @@ class CloudBackMain(Stack):
         # # Add POST method to the existing movies resource
         # moviesResource.add_method("POST", post_movies_integration)
  
-        self.api.root.add_resource("postMovies").add_method("POST", post_movies_integration)
+        self.api.root.add_resource("postMovies").add_method("POST", post_movies_integration,authorizer=authorizer)
 
 
         self.api.root.add_resource("getMovie").add_method("GET", get_movie_by_id_integration)
