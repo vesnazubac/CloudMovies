@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CreateAccommodationComponent } from './create-accommodation/create-accommodation.component';
+import { CreateMovieComponent } from './create-movie/create-movie.component';
 import { AvailabilityCardComponent } from './availability-card/availability-card.component';
 import { EditAccommodationComponent } from './edit-accommodation/edit-accommodation.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -24,11 +24,12 @@ import { AccommodationsReservationsComponent } from './accommodations-reservatio
 import { FavouriteAccommodationsComponent } from './favourite-accommodations/favourite-accommodations.component';
 import { AccommodationComponent } from '../accommodation/accommodation/accommodation.component';
 import { LayoutModule } from '../layout/layout.module';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
   declarations: [
-    CreateAccommodationComponent,
+    CreateMovieComponent,
     EditAccommodationComponent,
    EditPriceCardDialogComponent,
    AccommodationRequestsComponent,
@@ -51,7 +52,8 @@ import { LayoutModule } from '../layout/layout.module';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MaterialModule
+    MaterialModule,
+    HttpClientModule
   ]
 })
 export class AccommodationManagmentModule { }

@@ -47,14 +47,24 @@ export class RegisterFormComponent {
     this.router.navigate(['home']);
   }
 
+  formatBirthdate(dateString: string): string {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+
   register() {
-  
+    if(this.createRegisterForm.value.birthdate){
+      
+    }
     const user: UserPostDTO = {
       firstName: this.createRegisterForm.value.name,
       lastName: this.createRegisterForm.value.surname,
       username: this.createRegisterForm.value.username ?? '',
       password: this.createRegisterForm.value.password,
-      birthdate: this.createRegisterForm.value.birthdate?.toString().slice(0, 10),
+      birthdate: this.createRegisterForm.value.birthdate ? this.formatBirthdate(this.createRegisterForm.value.birthdate) : undefined,
       email: this.createRegisterForm.value.username ?? ''
     };
 
