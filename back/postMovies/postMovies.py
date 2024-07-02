@@ -81,3 +81,4 @@ def lambda_handler(event, context):
                 'Access-Control-Allow-Headers': 'Content-Type, Authorization'
             }
         }
+        }

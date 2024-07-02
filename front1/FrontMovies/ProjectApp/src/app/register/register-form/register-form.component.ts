@@ -20,6 +20,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CommonModule } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatSelectModule } from '@angular/material/select';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-register-form',
@@ -41,7 +42,7 @@ export class RegisterFormComponent {
     birthdate: new FormControl('', Validators.required)
   });
 
-  constructor(private cdr: ChangeDetectorRef, private userService: UserService, private router: Router, private snackBar: MatSnackBar) {}
+  constructor(private cdr: ChangeDetectorRef, private userService: UserService, private router: Router, private snackBar: MatSnackBar,private httpClient: HttpClient) {}
 
   navigateToHome() {
     this.router.navigate(['home']);
@@ -91,6 +92,7 @@ export class RegisterFormComponent {
 
     // Add birthdate attribute
     if (user.birthdate) {
+      console.log(user.birthdate)
       const birthdateAttribute = new CognitoUserAttribute({ Name: 'birthdate', Value: user.birthdate });
       attributeList.push(birthdateAttribute);
     }
@@ -110,6 +112,9 @@ export class RegisterFormComponent {
           this.openErrorSnackBar('Failed to register user. Please try again.');
           return;
         }
+        if(user.username)
+          this.addUserToGroup(user.username, 'Users');
+
         console.log('User registered successfully:', result?.user);
         //this.navigateToHome(); // Example navigation to home page after successful registration
         this.router.navigate(['verifyAccount',user.username])
@@ -118,6 +123,24 @@ export class RegisterFormComponent {
    
 
   }
+
+  formatBirthdate(dateString: string): string {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
+  }
+
+  addUserToGroup(username: string, groupName: string) {
+    const payload = { userName: username, group_name: groupName, poolId: environment.userPoolId};
+    this.httpClient.post(environment.cloudHost + 'addUserToGroup', payload)
+      .subscribe(response => {
+        console.log('User added to group successfully');
+      }, error => {
+        console.error('Failed to add user to group', error);
+      });
+}
 
   openErrorSnackBar(message: string) {
     this.snackBar.open(message, 'Close', {

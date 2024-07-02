@@ -5,7 +5,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Login } from 'src/app/auth/model/login.model';
 import { AuthService } from 'src/app/auth/auth.service';
 import { environment } from 'src/env/env';
 import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
@@ -16,10 +15,10 @@ import { ReactiveFormsModule } from '@angular/forms';
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.css'],
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule,ReactiveFormsModule]
+  imports: [MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule, ReactiveFormsModule]
 })
 export class LoginFormComponent {
-   hide:boolean=true;
+  hide: boolean = true;
   @ViewChild('usernameInput') usernameInput!: ElementRef;
   @ViewChild('passwordInput') passwordInput!: ElementRef;
 
@@ -61,28 +60,30 @@ export class LoginFormComponent {
 
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess: (result) => {
-          
           console.log('Login successful:', result);
-          this.router.navigate(['/home']);
-          // Uzimanje tokena pristupa iz localStorage-a
-const accessToken = localStorage.getItem('CognitoIdentityServiceProvider.2amer6cbjphp31o6vpkcs469up.a3743812-d031-7047-b085-bee35a0e2046.accessToken');
 
-// Parsiranje JWT tokena pristupa da biste dobili informacije
-const tokenParts = accessToken?.split('.');
-const encodedPayload = tokenParts ? tokenParts[1] : '';
-const decodedPayload = atob(encodedPayload);
-const tokenPayload = JSON.parse(decodedPayload);
+          cognitoUser.getSession((err:any, session:any) => {
+            if (err) {
+              console.error('Error getting session:', err);
+              return;
+            }
 
-// Dobijanje korisničkog imena iz payload-a
-//const username = tokenPayload.sub;
+            if (session) {
+              // Dobijanje idToken-a iz CognitoUserSession
+              const idToken = session.getIdToken().getJwtToken();
+              console.log('idToken:', idToken);
 
-// console.log('Username:', username);
-const username=this.getUsernameFromSub(tokenPayload.sub)
+              // Čuvanje idToken-a u localStorage
+              localStorage.setItem('idToken', idToken);
+              console.log('Stored idToken in localStorage:', idToken);
 
+              this.router.navigate(['/home']);
+            }
+          });
         },
         onFailure: (err) => {
           console.error('Login failed:', err);
-        },
+        }
       });
     }
   }
@@ -91,42 +92,37 @@ const username=this.getUsernameFromSub(tokenPayload.sub)
     this.router.navigate(['register']);
   }
 
-  
-// Konfiguracija za vaš User Pool
-
-
-// Funkcija za dobijanje korisničkog imena na osnovu sub identifikatora
- 
- 
-// Funkcija za dobijanje korisničkog imena na osnovu sub identifikatora
+  // Funkcija za dobijanje korisničkog imena na osnovu sub identifikatora
   getUsernameFromSub(sub: string) {
-   const  poolData1 = {
-      UserPoolId: environment.userPoolId, // Zamijenite 'your-user-pool-id' sa ID-om vašeg User Pool-a
-      ClientId: environment.userPoolClientId       // Zamijenite 'your-client-id' sa ID-om vašeg Cognito Client-a
+    const poolData = {
+      UserPoolId: environment.userPoolId,
+      ClientId: environment.userPoolClientId
     };
-    
-    const userPool1 = new CognitoUserPool(poolData1);
-    const userData = {
-      Username: sub, // Sub identifikator korisnika za koga želite da dobijete informacije
-      Pool: this.userPool
-  };
 
-  const cognitoUser = new CognitoUser(userData); // Ispravno kreiranje CognitoUser objekta
-  if (cognitoUser.getSignInUserSession() !== null)
-  cognitoUser.getUserAttributes((err, attributes) => {
+    const userPool = new CognitoUserPool(poolData);
+    const userData = {
+      Username: sub,
+      Pool: userPool
+    };
+
+    const cognitoUser = new CognitoUser(userData);
+    cognitoUser.getUserAttributes((err, attributes) => {
       if (err) {
-          console.error('Error fetching user attributes:', err);
-          return;
+        console.error('Error fetching user attributes:', err);
+        return;
       }
-      if (attributes)
+
       // Traženje korisničkog imena (username)
-      for (let attribute of attributes) {
+      if (attributes) {
+        for (let attribute of attributes) {
           if (attribute.getName() === 'sub') {
-              console.log('Username:', attribute.getValue());
-              break;
+            console.log('Username:', attribute.getValue());
+            break;
           }
+        }
       }
-  });
+    });
+  }
 }
- }
+
 
