@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
@@ -71,7 +72,12 @@ def lambda_handler(event, context):
             else:
                 response = table.scan()
 
+            # Convert Decimal to float or string
             items = response.get('Items', [])
+            for item in items:
+                for key, value in item.items():
+                    if isinstance(value, Decimal):
+                        item[key] = float(value)  # Convert Decimal to float
 
         # Log response for debugging
         print(f"DynamoDB response: {response}")
