@@ -76,8 +76,12 @@ export class LoginFormComponent {
               // Čuvanje idToken-a u localStorage
               localStorage.setItem('idToken', idToken);
               console.log('Stored idToken in localStorage:', idToken);
+              
+              const groups = session.getIdToken().payload['cognito:groups'];
+              console.log('User groups:', groups);
 
-              this.router.navigate(['/home']);
+              localStorage.setItem('Group',groups);
+              this.router.navigate(["/home"])
             }
           });
         },

@@ -43,11 +43,13 @@ export class NavBarComponent {
   }
 
   isAdmin(): boolean {
-    console.log("USAO U IS ADM")
-    console.log('ROLA JE ', this.role)
- 
-    return this.authService.getRole() == RoleEnum.ADMIN;
-  }
+    let userGroups = localStorage.getItem('Group');
+    if (userGroups) {
+        //let groupsArray = JSON.parse(userGroups); // Pretvaranje stringa u JavaScript objekat (niz)
+        return userGroups.includes('Admins');
+    }
+    return false; // Vraća false ako nije pronađen 'Admins' u nizu
+}
 
   isGuest(): boolean {
     return this.authService.getRole() == RoleEnum.GUEST;
