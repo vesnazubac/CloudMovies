@@ -17,7 +17,7 @@ import { MatSort } from '@angular/material/sort';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { Upload } from '@aws-sdk/lib-storage';
+
 import { environment } from 'src/env/env';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 

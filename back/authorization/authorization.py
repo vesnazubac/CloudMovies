@@ -8,8 +8,10 @@ s3_client = boto3.client('s3')
 iam = boto3.client('iam')
 
 def lambda_handler(event,context):
-
-    token=event["authorizationToken"].split()[1]
+    try:
+        token=event["authorizationToken"].split()[1]
+    except:
+        token=event['headers']['Authorization'].split()[1]
     
     user_pool_id=os.environ['USER_POOL_ID']
 
