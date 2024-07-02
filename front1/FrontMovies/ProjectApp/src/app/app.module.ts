@@ -13,7 +13,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AccommodationModule } from './accommodation/accommodation.module';
 import { MatNativeDateModule } from '@angular/material/core';
 import { Interceptor } from './auth/interceptor';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthModule } from './auth/auth.module';
 import { LoginFormComponent } from './login/login-form/login-form.component';
 import { MaterialModule } from './infrastructure/material/material.module';
@@ -44,7 +44,8 @@ import { AccountConfirmationComponent } from './confirmation/account-confirmatio
     MaterialModule,
     ReservationComponent,
     OwnerReportComponent,
-    MatDatepickerModule
+    MatDatepickerModule,
+    HttpClientModule
   ],
   providers: [ {
     provide: HTTP_INTERCEPTORS,

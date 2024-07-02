@@ -15,14 +15,16 @@ def lambda_handler(event, context):
         #id_filma = body.get('id_filma')
         id_filma=str(uuid.uuid4())
         naslov = body.get('naslov')
-        trajanje = body.get('trajanje')
         zanr = body.get('zanr')
-        rezolucija = body.get('rezolucija')
         opis = body.get('opis')
         glumci = body.get('glumci')
         reziser = body.get('reziser')
         video_data = body.get('video_data')  # Base64 encoded video
-        
+        file_type = body.get('file_type')
+        file_name = body.get('file_name')
+        file_size = body.get('file_size')
+        file_modified = body.get('file_modified')
+
         # Validate required fields
         if not id_filma or not naslov or not video_data:
             raise ValueError("Missing required fields")
@@ -33,13 +35,15 @@ def lambda_handler(event, context):
             Item={
                 'id_filma': id_filma,
                 'naslov': naslov,
-                'trajanje': trajanje,
                 'zanr': zanr,
-                'rezolucija': rezolucija,
                 'glumci': glumci,
                 'reziser': reziser,
                 'opis': opis,
-                'combined_key':f"{naslov}|{glumci}|{opis}|{reziser}|{zanr}"
+                'combined_key':f"{naslov}|{glumci}|{opis}|{reziser}|{zanr}",
+                'file_type':file_type,
+                'file_name':file_name,
+                'file_size':file_size,
+                'file_modified':file_modified
             }
         )
         
@@ -48,14 +52,20 @@ def lambda_handler(event, context):
         video_binary = base64.b64decode(video_data)
         s3.put_object(
             Bucket=bucket_name,
-            Key=f"{id_filma}.mp4",
+            Key=f"{id_filma}.{file_type}",
             Body=video_binary,
-            ContentType='video/mp4'
+            ContentType=f'video/{file_type}'
         )
 
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Movie data added successfully'})
+            'body': json.dumps({'message': 'Movie data added successfully'}),
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods':"GET,POST,OPTIONS,PUT",
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+            }
         }
     except Exception as e:
         # Log error
@@ -63,5 +73,12 @@ def lambda_handler(event, context):
         # Return error response
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': str(e)}),
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+            }
+        }
         }

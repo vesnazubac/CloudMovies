@@ -51,7 +51,7 @@ export class HomeComponent {
       .set('glumci',actors ?? '');
       console.log(params)
 
-      const url = `${environment.cloudHost}/searchMovies`;
+      const url = `${environment.cloudHost}searchMovies`;
       
       this.http.get(url, { params }).subscribe({
         next: (data: any) => {

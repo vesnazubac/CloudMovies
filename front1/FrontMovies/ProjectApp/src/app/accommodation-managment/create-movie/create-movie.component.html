@@ -1,0 +1,49 @@
+<form [formGroup]="createMovieForm">
+<div style="text-align: center;">
+    <h2 class="register-header">Post a new movie</h2>
+    <p>
+        <mat-form-field appearance="outline">
+          <mat-label>Title</mat-label>
+          <input matInput placeholder="Movie Name" formControlName="name">
+          <mat-error *ngIf="createMovieForm.get('name')?.hasError('required')">This field is required</mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Actors</mat-label>
+          <input matInput placeholder="Actors" formControlName="actors">
+          <mat-error *ngIf="createMovieForm.get('actors')?.hasError('required')">This field is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Description</mat-label>
+          <input matInput placeholder="Description" formControlName="description">
+          <mat-error *ngIf="createMovieForm.get('description')?.hasError('required')">This field is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Director</mat-label>
+          <input matInput placeholder="Director" formControlName="director">
+          <mat-error *ngIf="createMovieForm.get('director')?.hasError('required')">This field is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Genre</mat-label>
+          <input matInput placeholder="Genre" formControlName="genre">
+          <mat-error *ngIf="createMovieForm.get('genre')?.hasError('required')">This field is required</mat-error>
+        </mat-form-field>
+
+    <div class="image-table-container">
+      <h2>Movie file</h2>
+      
+    </div>
+    <div class="button-container">
+      <div class="buttons">
+      </div>
+      <input type="file" (change)="onFileSelected($event)"/>
+      </div>
+      <button (click)="register()" mat-button style="background-color: #1e88e5; color: white;margin-top: 4%;">Post movie</button>
+</div>
+    
+    
+</form>
+  

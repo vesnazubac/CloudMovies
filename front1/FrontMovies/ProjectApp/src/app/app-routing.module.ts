@@ -4,7 +4,7 @@ import {HomeComponent} from "./layout/home/home.component";
 import { LoginFormComponent } from './login/login-form/login-form.component';
 import { RegisterFormComponent } from './register/register-form/register-form.component';
 import { EditAccountComponent } from './accountmanagement/edit-account/edit-account.component';
-import { CreateAccommodationComponent } from './accommodation-managment/create-accommodation/create-accommodation.component';
+import { CreateMovieComponent } from './accommodation-managment/create-movie/create-movie.component';
 import { EditAccommodationComponent } from './accommodation-managment/edit-accommodation/edit-accommodation.component';
 import { AccommodationComponent } from './accommodation/accommodation/accommodation.component';
 import { AccommodationCardsComponent } from './accommodation/accommodation-cards/accommodation-cards.component';
@@ -38,7 +38,7 @@ const routes: Routes = [
   {component:RegisterFormComponent,path:"register"},
   {component:SuccessComponent, path:"activate/:token"},
   {component:EditAccountComponent,path:"editAccount"},
-  {component:CreateAccommodationComponent,path:"createAccommodation"},
+  {component:CreateMovieComponent,path:"postMovie"},
   {component:EditAccommodationComponent, path:"editAccommodation/:id"},
   {component:CreateReservationComponent, path:"createReservation"},
   {component:EditReservationComponent, path:"editReservation"},
