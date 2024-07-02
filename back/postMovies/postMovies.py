@@ -15,7 +15,6 @@ def lambda_handler(event, context):
         #id_filma = body.get('id_filma')
         id_filma=str(uuid.uuid4())
         naslov = body.get('naslov')
-        trajanje = body.get('trajanje')
         zanr = body.get('zanr')
         opis = body.get('opis')
         glumci = body.get('glumci')
@@ -36,7 +35,6 @@ def lambda_handler(event, context):
             Item={
                 'id_filma': id_filma,
                 'naslov': naslov,
-                'trajanje': trajanje,
                 'zanr': zanr,
                 'glumci': glumci,
                 'reziser': reziser,
