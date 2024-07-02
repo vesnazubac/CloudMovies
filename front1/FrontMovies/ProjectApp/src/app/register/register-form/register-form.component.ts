@@ -55,7 +55,7 @@ export class RegisterFormComponent {
     const day = ('0' + date.getDate()).slice(-2);
     return `${year}-${month}-${day}`;
   }
-
+  
   register() {
     if(this.createRegisterForm.value.birthdate){
       
@@ -124,13 +124,7 @@ export class RegisterFormComponent {
 
   }
 
-  formatBirthdate(dateString: string): string {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = ('0' + (date.getMonth() + 1)).slice(-2);
-    const day = ('0' + date.getDate()).slice(-2);
-    return `${year}-${month}-${day}`;
-  }
+  
 
   addUserToGroup(username: string, groupName: string) {
     const payload = { userName: username, group_name: groupName, poolId: environment.userPoolId};
