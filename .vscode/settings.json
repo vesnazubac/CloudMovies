@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
-        "./back/package"
+        "./back/package",
+        "./back/cdk.out/asset.0049d020d7815132f73f991cfa10d7fc3a8d452b0cee3f9710b05e0d3eb2db8c"
     ]
 }

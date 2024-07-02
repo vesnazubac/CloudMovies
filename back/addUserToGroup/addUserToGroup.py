@@ -33,6 +33,7 @@ def lambda_handler(event, context):
             'body': json.dumps(str(e)),
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': True
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods': "POST,OPTIONS"
             }
         }

@@ -55,7 +55,8 @@ export class RegisterFormComponent {
       lastName: this.createRegisterForm.value.surname,
       username: this.createRegisterForm.value.username ?? '',
       password: this.createRegisterForm.value.password,
-      birthdate: this.createRegisterForm.value.birthdate?.toString().slice(0, 10),
+      birthdate: this.createRegisterForm.value.birthdate ? this.formatBirthdate(this.createRegisterForm.value.birthdate) : undefined,
+      //birthdate: this.createRegisterForm.value.birthdate?.toString().slice(0, 10),
       email: this.createRegisterForm.value.username ?? ''
     };
 
@@ -82,6 +83,7 @@ export class RegisterFormComponent {
 
     // Add birthdate attribute
     if (user.birthdate) {
+      console.log(user.birthdate)
       const birthdateAttribute = new CognitoUserAttribute({ Name: 'birthdate', Value: user.birthdate });
       attributeList.push(birthdateAttribute);
     }
@@ -102,7 +104,7 @@ export class RegisterFormComponent {
           return;
         }
         if(user.username)
-          this.addUserToGroup(user.username, 'Admins');
+          this.addUserToGroup(user.username, 'Users');
 
         console.log('User registered successfully:', result?.user);
         //this.navigateToHome(); // Example navigation to home page after successful registration
@@ -111,6 +113,14 @@ export class RegisterFormComponent {
     }
    
 
+  }
+
+  formatBirthdate(dateString: string): string {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}-${month}-${day}`;
   }
 
   addUserToGroup(username: string, groupName: string) {
