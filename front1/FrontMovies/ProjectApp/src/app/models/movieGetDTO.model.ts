@@ -7,4 +7,5 @@ export interface MovieGetDTO {
     opis: string;
     reziser: string;
     glumci: string;
+    s3_url:string
 }
