@@ -32,6 +32,13 @@
           <mat-error *ngIf="createMovieForm.get('genre')?.hasError('required')">This field is required</mat-error>
         </mat-form-field>
 
+        <mat-form-field appearance="outline">
+          <mat-label>Number of episodes</mat-label>
+          <input matInput placeholder="Episodes" formControlName="episodes" type="number">
+          <mat-error *ngIf="createMovieForm.get('genre')?.hasError('min')">At least 2 episodes</mat-error>
+        </mat-form-field>
+
+        <button mat-button (click)="confirmEpisodes()" style="background-color: #1e88e5; color: white; margin-top: 4%;">Confirm Episodes Number</button>
     <div class="image-table-container">
       <h2>Movie file</h2>
       
@@ -42,8 +49,18 @@
       <input type="file" (change)="onFileSelected($event)"/>
       </div>
       <button (click)="register()" mat-button style="background-color: #1e88e5; color: white;margin-top: 4%;">Post movie</button>
+
+
+      <div *ngIf="episodeFiles.length > 0">
+        <h2 class="register-header">Upload Episodes</h2>
+        <div *ngFor="let episode of episodeFiles.controls; let i = index">
+            <mat-label>Episode {{i + 1}} File</mat-label>
+            <input type="file" #episodeFileInput (change)="onFileSelected($event, i)">
+        </div>
+      </div>
+      <button (click)="registerSeries()" mat-button style="background-color: #1e88e5; color: white;margin-top: 4%;">Post series</button>
 </div>
     
-    
+
 </form>
   

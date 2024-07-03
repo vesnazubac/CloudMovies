@@ -75,12 +75,20 @@ mat-toolbar {
   line-height: 36px; /* Vertikalno poravnanje */
 }
 
+/* .button-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: right;
+  width: auto;
+} */
+
 .button-container {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  width: auto;
+  width: 100%; 
 }
+
 
 button {
   margin-right: 10px;

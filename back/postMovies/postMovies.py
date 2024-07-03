@@ -24,6 +24,7 @@ def lambda_handler(event, context):
         file_name = body.get('file_name')
         file_size = body.get('file_size')
         file_modified = body.get('file_modified')
+        episode = body.get('episode')
 
         # Validate required fields
         if not id_filma or not naslov or not video_data:
@@ -53,12 +54,15 @@ def lambda_handler(event, context):
                 'glumci': glumci,
                 'reziser': reziser,
                 'opis': opis,
+
                 'combined_key': f"{naslov}|{glumci}|{opis}|{reziser}|{zanr}",
                 'file_type': file_type,
                 'file_name': file_name,
                 'file_size': file_size,
                 'file_modified': file_modified,
-                's3_url': s3_url  # Dodajemo novi atribut s3_url
+                's3_url': s3_url,  # Dodajemo novi atribut s3_url
+                'episode':episode
+
             }
         )
 
