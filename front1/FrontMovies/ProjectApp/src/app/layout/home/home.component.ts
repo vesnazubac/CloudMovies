@@ -57,16 +57,26 @@ export class HomeComponent {
         next: (data: any) => {
           console.log('Rezultati pretrage:', data);
 
-          this.moviesList = data.map((item: any) => ({
-            id_filma: item.id_filma,
-            rezolucija: item.rezolucija,
-            zanr: item.zanr,
-            trajanje: item.trajanje,
-            naslov: item.naslov,
-            opis: item.opis,
-            reziser: item.reziser,
-            glumci: item.glumci,
-          }));
+          const uniqueTitles = new Set<string>();
+          const uniqueMoviesList: MovieGetDTO[] = [];
+
+          data.forEach((item: any) => {
+            if (!uniqueTitles.has(item.naslov)) {
+              uniqueTitles.add(item.naslov);
+              uniqueMoviesList.push({
+                id_filma: item.id_filma,
+                rezolucija: item.rezolucija,
+                zanr: item.zanr,
+                trajanje: item.trajanje,
+                naslov: item.naslov,
+                opis: item.opis,
+                reziser: item.reziser,
+                glumci: item.glumci,
+              });
+            }
+          });
+  
+          this.moviesList = uniqueMoviesList;
           console.log('Converted Movies:', this.moviesList);
         },
         error: (error) => {

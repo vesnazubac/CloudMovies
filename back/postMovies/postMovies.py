@@ -24,6 +24,7 @@ def lambda_handler(event, context):
         file_name = body.get('file_name')
         file_size = body.get('file_size')
         file_modified = body.get('file_modified')
+        episode = body.get('episode')
 
         # Validate required fields
         if not id_filma or not naslov or not video_data:
@@ -43,7 +44,8 @@ def lambda_handler(event, context):
                 'file_type':file_type,
                 'file_name':file_name,
                 'file_size':file_size,
-                'file_modified':file_modified
+                'file_modified':file_modified,
+                'episode':episode
             }
         )
         
