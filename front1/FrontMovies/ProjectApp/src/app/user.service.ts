@@ -26,6 +26,15 @@ export class UserService {
   getAllMovies(): Observable<MovieGetDTO[]> {
     return this.httpClient.get<MovieGetDTO[]>(environment.cloudHost + 'movies')
   }
+
+  getMovieByIdMovies(movieId: string, naslov: string): Observable<any> {
+    const params = {
+      id_filma: movieId,
+      naslov: naslov
+    };
+
+    return this.httpClient.get<any>(environment.cloudHost+'getMovie', { params });
+  }
   activateAccount(token: string): Observable<string> {
     return this.httpClient.put<string>(environment.apiHost + 'users/activate/' + token,{});
   }

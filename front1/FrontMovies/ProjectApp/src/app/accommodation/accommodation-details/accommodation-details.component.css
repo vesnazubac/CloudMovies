@@ -121,5 +121,57 @@
     margin-bottom: 2%;
   }
 
+
+  /* Global styles for action buttons */
+.action-button {
+  margin-top: 3%;
+  margin-left: 80%;
+  width: 20%;
+  background-color: #007bff; /* Adjust color as needed */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+/* Specific style for play button */
+.play-button {
+  margin-left: 50%;
+  background-color: #28a745; /* Green color for play button */
+}
+
+.play-button:hover {
+  background-color: #218838; /* Darker shade of green on hover */
+}
+
+/* Styling for icon inside buttons */
+.action-button mat-icon,
+.play-button mat-icon {
+  margin-right: 5px;
+}
+
+
+.download-button {
+  background-color: #007bff; /* Blue color for download button */
+}
+
+.download-button:hover {
+  background-color: #0056b3; /* Darker shade of blue on hover */
+}
+
+/* Styling for icon inside buttons */
+.action-button mat-icon {
+  margin-right: 5px;
+}
+
+p {
+  margin-bottom: 15px;
+  font-size: 20px;
+}
   
   
