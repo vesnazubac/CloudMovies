@@ -73,6 +73,7 @@ export class HomeComponent {
                 opis: item.opis,
                 reziser: item.reziser,
                 glumci: item.glumci,
+                s3_url:""
               });
             }
           });
