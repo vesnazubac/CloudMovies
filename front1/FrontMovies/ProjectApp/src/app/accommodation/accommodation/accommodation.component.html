@@ -10,7 +10,7 @@
     <p class="movie-actors">Actors: {{movie.glumci}}</p>
     
     <br>
-    <button [routerLink]="['/accommodations', movie.id_filma]">Show details</button>
+    <button [routerLink]="['/accommodations', movie.id_filma , movie.naslov]">Show details</button>
   </mat-card-content>
 </mat-card>
   

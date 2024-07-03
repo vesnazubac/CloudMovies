@@ -14,12 +14,19 @@ export class Interceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     const accessToken: any = localStorage.getItem('idToken');
-    //console.log("ACCES TOKEN JE : ",accessToken);
-    if (req.headers.get('skip')) return next.handle(req);
+    
+    const skipHeader = req.headers.get('skip');
+    // ako je postavljeno skip zaglavlje, ne postavljaj Authorization zaglavlje
+    if (skipHeader === 'true') {
+      const headers = req.headers.delete('Authorization');
+      const cloned = req.clone({ headers });
+      return next.handle(cloned);
+    }
+    // ako je postavljen skip header, ne postavljaj Authorization header
 
     if (accessToken) {
       const cloned = req.clone({
-        headers: req.headers.set('Authorization', 'Bearer ' + accessToken),
+       headers: req.headers.set('Authorization', 'Bearer ' + accessToken),
       });
       return next.handle(cloned);
     } else {

@@ -44,7 +44,7 @@ const routes: Routes = [
   {component:EditReservationComponent, path:"editReservation"},
   {component:AccommodationComponent,path:"accommodation"},
   {component:AccommodationCardsComponent,path:"accommodation-cards"},
-  {component: AccommodationDetailsComponent ,path: 'accommodations/:id'},
+  {component: AccommodationDetailsComponent ,path: 'accommodations/:id/:naslov'},
   {component:UsersViewComponent,path:'users-view'},
   {component:AccommodationRequestsComponent,path:'accommodationsRequests'},
   {component:SearchedAccommodationCardsComponent,path:'searched-accommodation-cards'},
