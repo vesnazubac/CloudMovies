@@ -15,6 +15,7 @@ import { environment } from 'src/env/env';
 })
 export class HomeComponent {
    moviesList: MovieGetDTO[] = []
+   selectedMovie: any; // Holds details of the selected movie
 
    constructor( private snackBar:MatSnackBar, private fb: FormBuilder,private router: Router,private http: HttpClient) {
   }
@@ -94,6 +95,13 @@ export class HomeComponent {
      //   console.error('Error fetching accommodations:', error);
     //  },
     //});
+  }
+
+  onMovieClicked(movie: any) {
+    // Function to handle movie click event
+    this.selectedMovie = movie;
+    console.log('Clicked movie:', movie);
+    // You can perform any actions here based on the clicked movie
   }
   }
 

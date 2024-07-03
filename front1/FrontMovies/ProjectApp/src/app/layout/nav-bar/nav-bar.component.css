@@ -12,6 +12,18 @@ mat-toolbar {
   margin-right: 20px;
   font-style: italic; /* Ukoseno */
 }
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* Pomeranje dugmadi na desnu stranu */
+  align-items: center;
+  flex-grow: 1; /* Dugmad zauzimaju preostali prostor */
+  margin-right: 20px; /* Dodatni razmak od desne ivice */
+}
+
+.button-container button {
+  margin-left: 10px; /* Razmak između dugmadi */
+  height: 36px; /* Visina dugmeta */
+}
 
 .search-container {
   flex-grow: 1;

@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 import boto3
 
@@ -16,6 +17,13 @@ def lambda_handler(event, context):
     try:
         # Čitanje podataka iz tabele
         response = table.scan()
+        
+        items=response.get('Items',[])
+        
+        for item in items:
+            for key,value in item.items():
+                if isinstance(value,Decimal):
+                    item[key]=float(value)
 
         #items = response['Items']
         
@@ -38,7 +46,7 @@ def lambda_handler(event, context):
         # Vraćanje odgovora sa podacima iz tabele
         return {
             'statusCode': 200,
-            'body': json.dumps(response['Items']),
+            'body': json.dumps(items),
               'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True,

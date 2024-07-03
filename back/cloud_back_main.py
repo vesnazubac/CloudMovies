@@ -46,7 +46,8 @@ class CloudBackMain(Stack):
                            removal_policy=RemovalPolicy.DESTROY,  # Za razvojno okruženje, uklonite za produkciju
                            auto_delete_objects=True)  # Automatsko brisanje objekata prilikom brisanja bucketa
 
-        
+       
+
         user_pool = cognito.UserPool(
             self, "UserPoolMovie",
             user_pool_name="MovieAppUserPool",
@@ -129,8 +130,8 @@ class CloudBackMain(Stack):
                 
         admin_role.add_to_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
-            actions=["s3:PutObject"],
-            resources=[f"{bucket.bucket_arn}/*"]))
+            actions=["s3:PutObject","s3:GetObject","dynamodb:GetItem",],
+            resources=[table.table_arn,f"{bucket.bucket_arn}/*"]))
         admin_role.add_to_policy(iam.PolicyStatement(
         effect=iam.Effect.ALLOW,
         actions=["dynamodb:PutItem"],
@@ -390,10 +391,17 @@ class CloudBackMain(Stack):
     ))
         
         #user_pool.grant_invoke(login_user_lambda_function)
+        bucket.add_to_resource_policy(iam.PolicyStatement(
+        effect=iam.Effect.ALLOW,
+        actions=["s3:GetObject"],
+        principals=[iam.AnyPrincipal()],
+        resources=[bucket.bucket_arn + "/*"]
+    ))
 
         bucket.grant_put(post_movie_lambda_function)
         bucket.grant_write(post_movie_lambda_function)
         bucket.grant_read(get_movie_by_id_lambda_function)
+        bucket.grant_read(get_movie_lambda_function)
         search_table.grant_read_data(search_movies_lambda_function)
 
         register_user_integration = apigateway.LambdaIntegration(register_user_lambda_function)
