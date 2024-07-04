@@ -28,6 +28,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, map } from 'rxjs';
 import { MovieGetDTO } from 'src/app/models/movieGetDTO.model';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { environment } from 'src/env/env';
 
 @Component({
     selector: 'app-accommodation-details',
@@ -89,6 +90,47 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
     this.router.navigate(['/home']);
   }
 
+  isAdmin(): boolean {
+    let userGroups = localStorage.getItem('Group');
+    if (userGroups) {
+        //let groupsArray = JSON.parse(userGroups); // Pretvaranje stringa u JavaScript objekat (niz)
+        return userGroups.includes('Admins');
+    }
+    return false; // Vraća false ako nije pronađen 'Admins' u nizu
+  }
+  delete(): void{
+    console.log('Kliknuo button')
+    var deleteData={
+      'id_filma':this.id,
+      'naslov':this.naslov
+    }
+
+    console.log(deleteData)
+    const url = `${environment.cloudHost}deleteMovie`;
+    const options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      }),
+      body: {
+        id_filma: this.id,
+        naslov: this.naslov
+      }
+    };
+
+    this.http
+      .delete(url, options)
+      .subscribe(
+        (response: any) => {
+          console.log('Delete response:', response);
+          this.openSnackBar('Film uspešno obrisan.');
+          this.router.navigate(['/home']);
+        },
+        (error: any) => {
+          console.error('Error deleting movie:', error);
+          this.openSnackBar('Greška prilikom brisanja filma.');
+        }
+      );
+  }
   play(){
     this.userService.getAllMovies().subscribe(
       (movies: MovieGetDTO[]) => {

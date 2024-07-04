@@ -380,9 +380,20 @@ class CloudBackMain(Stack):
             []
         )
 
+        delete_movie_lambda_function = create_lambda_function(
+            "deleteMovie",
+            "deleteMovieFunction",
+            "deleteMovie.lambda_handler",
+            "deleteMovie",
+            "DELETE",
+            []
+        )
+
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
         table.grant_write_data(post_movie_lambda_function)
+        table.grant_read_write_data(delete_movie_lambda_function)
+        bucket.grant_delete(delete_movie_lambda_function)
         bucket.add_to_resource_policy(iam.PolicyStatement(
         effect=iam.Effect.ALLOW,
         actions=["s3:PutObject"],
@@ -422,6 +433,10 @@ class CloudBackMain(Stack):
         #Ova metoda kreira novi resurs movies. To znači da će URL za ovaj resurs biti /movies.
         #To znači da će se, kada API Gateway primi GET zahtev na /movies, pozvati get_movie_lambda_function.
         self.api.root.add_resource("movies").add_method("GET", get_movies_integration) #Ova metoda dodaje novi resurs pod nazivom movies na root nivou API-ja.
+
+
+        delete_movie_integration = apigateway.LambdaIntegration(delete_movie_lambda_function)
+        self.api.root.add_resource("deleteMovie").add_method("DELETE", delete_movie_integration)
         #self.api.root.add_resource("searchMovies").add_method("GET", search_movies_integration)
         #self.api.root("movies").add_method("POST", post_movies_integration)
            # Assume the movies resource already exists
