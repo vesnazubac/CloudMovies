@@ -12,7 +12,7 @@
     <p><strong>Actors:</strong> {{ movie?.glumci }}</p>
     <p><strong>Description:</strong> {{ movie?.opis }}</p>
     <p><strong>Director:</strong> {{ movie?.reziser }}</p>
-    
+    <p><strong>Genre:</strong> {{ movie?.zanr }}</p>
     <!-- <button (click)="goBack()" style=" margin-left: 100%;">
       <mat-icon>arrow_back</mat-icon>
     </button> -->
@@ -25,5 +25,8 @@
       <mat-icon>get_app</mat-icon> Download Movie
     </button>
    
+    <button *ngIf="isAdmin()" (click)="delete()" class="action-button download-button"  style=" margin-left: 70%; background-color: red;">
+      <mat-icon>get_app</mat-icon> Delete Movie
+    </button>
   </div>
 </div>
