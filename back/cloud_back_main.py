@@ -389,6 +389,15 @@ class CloudBackMain(Stack):
             []
         )
 
+        put_movie_lambda_function = create_lambda_function(
+            "putMovie",
+            "putMovieFunction",
+            "putMovie.lambda_handler",
+            "putMovie",
+            "PUT",
+            []
+        )
+
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
         table.grant_write_data(post_movie_lambda_function)
@@ -437,6 +446,9 @@ class CloudBackMain(Stack):
 
         delete_movie_integration = apigateway.LambdaIntegration(delete_movie_lambda_function)
         self.api.root.add_resource("deleteMovie").add_method("DELETE", delete_movie_integration, authorizer=authorizer)
+
+        put_movie_integration = apigateway.LambdaIntegration(put_movie_lambda_function)
+        self.api.root.add_resource("putMovie").add_method("PUT",put_movie_integration) #stavi authorizer na kraju
         #self.api.root.add_resource("searchMovies").add_method("GET", search_movies_integration)
         #self.api.root("movies").add_method("POST", post_movies_integration)
            # Assume the movies resource already exists
