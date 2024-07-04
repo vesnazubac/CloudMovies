@@ -28,5 +28,49 @@
     <button *ngIf="isAdmin()" (click)="delete()" class="action-button download-button"  style=" margin-left: 70%; background-color: red;">
       <mat-icon>get_app</mat-icon> Delete Movie
     </button>
+
+    <button *ngIf="isAdmin()" (click)="edit()" class="action-button download-button"  style=" margin-left: 70%; background-color: yellowgreen;">
+      <mat-icon>get_app</mat-icon> Edit Movie
+    </button>
+
+    <form *ngIf="showEditForm" [formGroup]="editMovieForm">
+      <div style="text-align: center;">
+          <h2 class="register-header">Edit movie</h2>
+          <p> 
+              <mat-form-field appearance="outline">
+                <mat-label>Actors</mat-label>
+                <input matInput placeholder="Actors" formControlName="actors">
+                <mat-error *ngIf="editMovieForm.get('actors')?.hasError('required')">This field is required</mat-error>
+              </mat-form-field>
+      
+              <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <input matInput placeholder="Description" formControlName="description">
+                <mat-error *ngIf="editMovieForm.get('description')?.hasError('required')">This field is required</mat-error>
+              </mat-form-field>
+      
+              <mat-form-field appearance="outline">
+                <mat-label>Director</mat-label>
+                <input matInput placeholder="Director" formControlName="director">
+                <mat-error *ngIf="editMovieForm.get('director')?.hasError('required')">This field is required</mat-error>
+              </mat-form-field>
+      
+              <mat-form-field appearance="outline">
+                <mat-label>Genre</mat-label>
+                <input matInput placeholder="Genre" formControlName="genre">
+                <mat-error *ngIf="editMovieForm.get('genre')?.hasError('required')">This field is required</mat-error>
+              </mat-form-field>
+    
+          <div class="image-table-container">
+            <h2>New movie file (optional)</h2>
+            
+          </div>
+          <input type="file" (change)="onFileSelected($event)"/>
+      </div>
+          
+      <button *ngIf="isAdmin()" (click)="confirmEdit()" class="action-button download-button"  style=" margin-left: 70%; background-color: yellowgreen;">
+        <mat-icon>get_app</mat-icon> Confirm Edit
+      </button>
+      </form>
   </div>
 </div>

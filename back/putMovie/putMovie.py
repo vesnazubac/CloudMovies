@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 import boto3
 import base64
@@ -7,6 +8,16 @@ import uuid
 dynamodb = boto3.resource('dynamodb')
 s3 = boto3.client('s3')
 
+def decimal_to_float(obj):
+    if isinstance(obj, list):
+        return [decimal_to_float(i) for i in obj]
+    elif isinstance(obj, dict):
+        return {k: decimal_to_float(v) for k, v in obj.items()}
+    elif isinstance(obj, Decimal):
+        return float(obj)
+    else:
+        return obj
+    
 def lambda_handler(event, context):
     try:
         # Load request body
@@ -26,6 +37,8 @@ def lambda_handler(event, context):
         file_modified = body.get('file_modified')  # Optional
         episode = body.get('episode')  # Optional
 
+        if isinstance(file_size,Decimal):
+            file_size = float(file_size)
         # Validate required fields
         if not id_filma or not naslov:
             raise ValueError("Missing required fields")
@@ -85,10 +98,10 @@ def lambda_handler(event, context):
             ExpressionAttributeValues=expression_attribute_values,
             ReturnValues="UPDATED_NEW"
         )
-
+        updated_attributes = decimal_to_float(response.get('Attributes', {}))
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Movie data updated successfully', 'updated_attributes': response['Attributes']}),
+            'body': json.dumps({'message': 'Movie data updated successfully', 'updated_attributes': updated_attributes}),
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True,

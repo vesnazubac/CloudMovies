@@ -29,13 +29,14 @@ import { Observable, map } from 'rxjs';
 import { MovieGetDTO } from 'src/app/models/movieGetDTO.model';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/env/env';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-accommodation-details',
     templateUrl: './accommodation-details.component.html',
     styleUrls: ['./accommodation-details.component.css'],
     standalone: true,
-    imports: [MatChipsModule,MatPaginatorModule, MatIconModule,MatTableModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatListModule, CommonModule, LayoutModule, ReservationComponent]
+    imports: [ReactiveFormsModule,MatChipsModule,MatPaginatorModule, MatIconModule,MatTableModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatListModule, CommonModule, LayoutModule, ReservationComponent]
 })
 export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
 
@@ -65,6 +66,15 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
       duration: 4000,
     });
   }
+
+  editMovieForm=new FormGroup({
+    actors:new FormControl('',Validators.required),
+    description:new FormControl('',Validators.required),
+    director:new FormControl('',Validators.required),
+    genre:new FormControl('',Validators.required),
+  })
+  selectedFile:string;
+  showEditForm = false;
   ngOnInit() {
 
     this.route.params.subscribe(params => {
@@ -97,6 +107,123 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
         return userGroups.includes('Admins');
     }
     return false; // Vraća false ako nije pronađen 'Admins' u nizu
+  }
+
+  async onFileSelected(event: any, index: number = -1): Promise<void> {
+    const file = event.target.files[0];
+    if (file) {
+      const base64String = await this.uploadFile(file);
+      this.selectedFile = base64String;
+      
+    }
+  }
+
+  async uploadFile(file: File): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        if(reader.result){
+          const base64String = reader.result.toString().split(',')[1];
+          resolve(base64String);
+        }
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  }
+  edit() {
+    this.showEditForm = !this.showEditForm;
+
+    console.log(this.movie)
+    console.log(this._response)
+    if (this.showEditForm) {
+      // Set the form values to arbitrary strings
+      this.editMovieForm.patchValue({
+        actors: this.movie.glumci,
+        description: this.movie.opis,
+        director: this.movie.reziser,
+        genre: this.movie.zanr
+      });
+    }
+  }
+  async confirmEdit(){
+    //console.log(this.selectedFile)
+
+    const fileInput = (document.querySelector('input[type="file"]') as HTMLInputElement);
+    var file = null;
+    if(fileInput.files){
+      file = fileInput.files[0];
+    }
+    console.log(file)
+    const url = `${environment.cloudHost}putMovie`;
+
+    if(file){
+      // poziv put sa fajlom
+      const video_data = await this.uploadFile(file);
+    
+      var movieData = {
+        id_filma: this.id,
+        naslov: this.naslov,
+        glumci: this.editMovieForm.get('actors')?.value ?? '',
+        opis: this.editMovieForm.get('description')?.value ?? '',
+        reziser: this.editMovieForm.get('director')?.value ?? '',
+        zanr: this.editMovieForm.get('genre')?.value ?? '',
+        video_data: video_data,
+        file_type: file.type.split('/')[1],
+        file_name: file.name,
+        file_size: file.size,
+        file_modified: new Date(file.lastModified).toISOString(),
+        combined_key:""
+      };
+      movieData['combined_key'] = movieData.naslov+"|"+movieData.glumci+"|"+movieData.opis+"|"+movieData.reziser+"|"+movieData.zanr;
+      console.log(movieData)
+
+      this.http
+      .put(url, movieData)
+      .subscribe(
+        (response: any) => {
+          console.log('Edit response:', response);
+          this.openSnackBar('Film uspešno izmenjen.');
+          
+        },
+        (error: any) => {
+          console.error('Error editing movie:', error);
+          this.openSnackBar('Greška prilikom izmene filma.');
+        }
+      );
+    }
+
+    else{
+      // poziv put bez izmene fajla
+      var editMovie = {
+        'id_filma':this.id,
+        'naslov':this.naslov,
+        'glumci':this.editMovieForm.get('actors')?.value ?? '',
+        'opis':this.editMovieForm.get('description')?.value ?? '',
+        'reziser':this.editMovieForm.get('director')?.value ?? '',
+        'zanr':this.editMovieForm.get('genre')?.value ?? '',
+        'combined_key':""
+      }
+      editMovie['combined_key'] = editMovie.naslov+"|"+editMovie.glumci+"|"+editMovie.opis+"|"+editMovie.reziser+"|"+editMovie.zanr;
+      console.log(editMovie['combined_key'])
+
+      
+
+      this.http
+      .put(url, editMovie)
+      .subscribe(
+        (response: any) => {
+          console.log('Edit response:', response);
+          this.openSnackBar('Film uspešno izmenjen.');
+          
+        },
+        (error: any) => {
+          console.error('Error editing movie:', error);
+          this.openSnackBar('Greška prilikom izmene filma.');
+        }
+      );
+    }
+    
   }
   delete(): void{
     console.log('Kliknuo button')
@@ -131,6 +258,7 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
         }
       );
   }
+  
   play(){
     this.userService.getAllMovies().subscribe(
       (movies: MovieGetDTO[]) => {
