@@ -175,3 +175,12 @@ p {
 }
   
   
+.mat-elevation-z8{
+  margin:auto;
+  text-align:center;
+  width: 60%;
+  margin-top: 2%;
+  padding:1%;
+  box-shadow: none;
+}
+

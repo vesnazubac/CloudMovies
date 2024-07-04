@@ -11,8 +11,14 @@
   <div class="content">
     <p><strong>Actors:</strong> {{ movie?.glumci }}</p>
     <p><strong>Description:</strong> {{ movie?.opis }}</p>
-    <p><strong>Director:</strong> {{ movie?.reziser }}</p>
-    <p><strong>Genre:</strong> {{ movie?.zanr }}</p>
+    <p><strong>Director:</strong> {{ movie?.reziser }}<button mat-button style="margin-left: 20px;" (click)="subscribeDirector(movie?.reziser)">
+      <mat-icon>notifications</mat-icon>
+      Subscribe on {{movie?.reziser}}
+    </button> </p>
+    <p><strong>Genre:</strong> {{ movie?.zanr }}  <button mat-button style="margin-left: 20px;" (click)="subscribeGenre(movie?.zanr)">
+      <mat-icon>notifications</mat-icon>
+      Subscribe on {{movie?.zanr}}
+    </button>  </p>
     <!-- <button (click)="goBack()" style=" margin-left: 100%;">
       <mat-icon>arrow_back</mat-icon>
     </button> -->
@@ -26,7 +32,38 @@
     </button>
    
     <button *ngIf="isAdmin()" (click)="delete()" class="action-button download-button"  style=" margin-left: 70%; background-color: red;">
-      <mat-icon>get_app</mat-icon> Delete Movie
+      <mat-icon>delete</mat-icon> Delete Movie
     </button>
   </div>
 </div>
+
+
+<div class="mat-elevation-z8">
+  <table mat-table [dataSource]="actorsDataSource" matSort>
+
+
+    <ng-container matColumnDef="Name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let element"> {{element}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-button style="margin-right: 20px;" (click)="subscribeActor(element)">
+          <mat-icon>notifications</mat-icon>
+          Subscribe
+        </button>  
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                 showFirstLastButtons
+                 aria-label="Select page of periodic elements">
+  </mat-paginator>
+</div>
+

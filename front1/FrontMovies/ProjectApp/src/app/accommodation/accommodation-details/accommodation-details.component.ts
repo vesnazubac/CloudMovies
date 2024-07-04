@@ -45,6 +45,9 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
   movie:MovieGetDTO;
   s3Url:string;
   _response:any;
+
+  actorsDataSource: MatTableDataSource<string>;
+  displayedColumns: string[] = ['Name', 'actions'];
   
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -78,6 +81,11 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
           if (this.movie && this.movie.s3_url) {
             this.s3Url = this.movie.s3_url.trim();
           }
+
+          if (this.movie && this.movie.glumci) {
+            const actorsList = this.movie.glumci.split(',');
+            this.actorsDataSource = new MatTableDataSource<string>(actorsList);
+          }
           
         },
         (error: any) => {
@@ -86,6 +94,20 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
       );
     });
   }
+
+subscribeActor(actor:string){
+
+}
+
+subscribeDirector(director:string|undefined){
+
+}
+
+subscribeGenre(genre:string|undefined){
+
+}
+
+
   goBack() {
     this.router.navigate(['/home']);
   }
