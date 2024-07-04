@@ -436,7 +436,7 @@ class CloudBackMain(Stack):
 
 
         delete_movie_integration = apigateway.LambdaIntegration(delete_movie_lambda_function)
-        self.api.root.add_resource("deleteMovie").add_method("DELETE", delete_movie_integration)
+        self.api.root.add_resource("deleteMovie").add_method("DELETE", delete_movie_integration, authorizer=authorizer)
         #self.api.root.add_resource("searchMovies").add_method("GET", search_movies_integration)
         #self.api.root("movies").add_method("POST", post_movies_integration)
            # Assume the movies resource already exists
