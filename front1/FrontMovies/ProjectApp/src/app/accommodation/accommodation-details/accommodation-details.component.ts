@@ -97,9 +97,54 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
 
 subscribeActor(actor:string){
 
+  const username = localStorage.getItem('username'); // Dohvati korisničko ime iz Local Storage-a
+  if (!username) {
+    console.error('Username not found in Local Storage.');
+    return;
+  }
+
+  const data = {
+    username: username,
+    actor:actor
+    
+  };
+  console.log("USENRAME ", username)
+  console.log("ACTOR   ",actor)
+  this.http.post<any>(`${environment.cloudHost}subscribeActor`, data).subscribe(
+    response => {
+      console.log(`Subscribed to ${actor} successfully:`, response);
+      this.openSnackBar('Uspesna pretplata na glumca!');
+    },
+    error => {
+      console.error(`Subscription to ${actor} failed:`, error);
+    }
+  );
+
 }
 
 subscribeDirector(director:string|undefined){
+  const username = localStorage.getItem('username'); // Dohvati korisničko ime iz Local Storage-a
+  if (!username) {
+    console.error('Username not found in Local Storage.');
+    return;
+  }
+
+  const data = {
+    username: username,
+    director : director
+    
+  };
+  console.log("USENRAME ", username)
+  console.log("DIRECTOR   ",director)
+  this.http.post<any>(`${environment.cloudHost}subscribeDirector`, data).subscribe(
+    response => {
+      console.log(`Subscribed to ${director} successfully:`, response);
+      this.openSnackBar('Uspesna pretplata!');
+    },
+    error => {
+      console.error(`Subscription to ${director} failed:`, error);
+    }
+  );
 
 }
 

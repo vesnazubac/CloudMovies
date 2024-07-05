@@ -205,7 +205,7 @@ export class CreateMovieComponent {
         },
         (error) => {
           console.error(error);
-          this.openSnackBar('An error occurred while posting the movie.');
+          this.openSnackBar('An error occured while posting movie!');
         }
       );
   }

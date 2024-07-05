@@ -3,19 +3,16 @@ import boto3
 import base64
 import os
 import uuid
-#from aws_cdk import aws_sns as sns
-#from cloud_back_main import sns
-#import aws_cdk.aws_sns as sns
-import aws_sns as sns
+
 dynamodb = boto3.resource('dynamodb')
 s3 = boto3.client('s3')
 # Inicijalizacija SNS klijenta'
-sns_client = boto3.client('sns')
-GENRE_TOPIC_ARN = {
-    'DRAMA': 'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-DRAMATopicC778FD55-x38ZwYOQ9WFM',
-    'KOMEDIJA': 'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-KOMEDIJATopic604600BE-t7Rn7MMUI0B0', 
-    'TRAGEDIJA':'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-TRAGEDIJATopicFD1738B9-W1LfKmapMDcO'
-}
+sns_client = boto3.client('sns',region_name='eu-central-1')
+# GENRE_TOPIC_ARN = {
+#     'DRAMA': 'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-DRAMATopicC778FD55-x38ZwYOQ9WFM',
+#     'KOMEDIJA': 'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-KOMEDIJATopic604600BE-t7Rn7MMUI0B0', 
+#     'TRAGEDIJA':'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-TRAGEDIJATopicFD1738B9-W1LfKmapMDcO'
+# }
 
 def lambda_handler(event, context):
     try:
@@ -61,7 +58,7 @@ def lambda_handler(event, context):
                 'id_filma': id_filma,
                 'naslov': naslov,
                 'zanr': zanr,
-                'glumci': glumci,
+                'glumci': glumci.replace(" ",""),
                 'reziser': reziser,
                 'opis': opis,
 
@@ -76,43 +73,52 @@ def lambda_handler(event, context):
             }
         )
 
+        topics = sns_client.list_topics()
+        actor_topic_arn=""
+
         for actor in glumci.split(','):
-            #pass
-            actor_topic_name = f"ActorTopic-{actor.strip()}"
-            actor_topic_arn = find_or_create_topic(actor_topic_name)
-
+            actor_topic_name = actor.upper()
+            print(actor_topic_name)
+            for topic in topics['Topics']:
+                if actor_topic_name in topic['TopicArn']:
+                    actor_topic_arn=topic['TopicArn']
+                    print("actor topic arn    ", actor_topic_arn)
             # Objavljivanje detalja o filmu na temu glumca
-            sns_client.publish(
-                TopicArn=actor_topic_arn,
-                Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
-                Subject='New Movie Uploaded with your favourite actor '+actor
-            )
+                    sns_client.publish(
+                        TopicArn=actor_topic_arn,
+                        Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
+                        Subject='New Movie Uploaded with your favourite actor '+actor
+                    )
 
-
-        topic_arn = GENRE_TOPIC_ARN[zanr.upper()]
-        if zanr == 'drama':
-           
-            if topic_arn:
+        genre_topic_name = zanr.upper()
+        genre_topic_arn = ""
+        print(genre_topic_name)
+        for topic in topics['Topics']:
+            if genre_topic_name in topic['TopicArn']:
+                genre_topic_arn=topic['TopicArn']
+                print("genre topic arn    ", genre_topic_arn)
+        # Objavljivanje detalja o filmu na temu zanra
                 sns_client.publish(
-                    TopicArn=topic_arn,
+                    TopicArn=genre_topic_arn,
                     Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
-                    Subject='New Drama Movie Uploaded - your favourite genre : DRAMA',
-                )
-        elif zanr=='komedija':
-            if topic_arn:
-                sns_client.publish(
-                    TopicArn=topic_arn,
-                    Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
-                    Subject='New Drama Movie Uploaded - your favourite genre : COMEDY',
-                )
-        elif zanr=='tragedija':
-            if topic_arn:
-                sns_client.publish(
-                    TopicArn=topic_arn,
-                    Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
-                    Subject='New Drama Movie Uploaded - your favourite genre : TRAGEDY',
+                    Subject='New Movie Uploaded - your favourite genre '+zanr
                 )
 
+
+
+        director_topic_name = reziser.upper()
+        director_topic_arn = ""
+        print(director_topic_name)
+        for topic in topics['Topics']:
+            if director_topic_name in topic['TopicArn']:
+                director_topic_arn=topic['TopicArn']
+                print("director topic arn    ", director_topic_arn)
+        # Objavljivanje detalja o filmu na temu rezisera
+                sns_client.publish(
+                    TopicArn=director_topic_arn,
+                    Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
+                    Subject='New Movie Uploaded - your favourite director '+reziser
+                )
 
         return {
             'statusCode': 200,
@@ -125,9 +131,8 @@ def lambda_handler(event, context):
             }
         }
     except Exception as e:
-        # Log error
         print(f"An error occurred: {e}")
-        # Return error response
+      
         return {
             'statusCode': 500,
             'body': json.dumps({'error': str(e)}),
@@ -138,21 +143,3 @@ def lambda_handler(event, context):
                 'Access-Control-Allow-Headers': 'Content-Type, Authorization'
             }
         }
-
-def find_or_create_topic(topic_name):
-    # Proverava da li postoji tema sa datim imenom, ako ne postoji, kreira je
-    try:
-        response = sns.Topic(Name=topic_name)
-        return response['TopicArn']
-    except sns.exceptions.TopicLimitExceededException:
-        # Ako postoji limit na broj tema, potrebno je implementirati logiku za upravljanje tim limitom
-        raise Exception("Topic limit exceeded. Unable to create new topic.")
-    except sns.exceptions.InvalidParameterValueException:
-        # Ako tema sa datim imenom već postoji, vraća njen ARN
-        topic_list = sns.list_topics()['Topics']
-        for topic in topic_list:
-            if topic_name in topic['TopicArn']:
-                return topic['TopicArn']
-        raise Exception("Failed to find or create topic.")
-
-

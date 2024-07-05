@@ -8,10 +8,10 @@ def lambda_handler(event, context):
     # Dohvatanje korisničkog imena i žanra iz ulaznih podataka
     body = json.loads(event['body'])
     username = body['username']
-    genre = body['genre'].upper().replace(" ", "")
+    director = body['director'].upper().replace(" ", "")
 
     
-    print(f"Received request: genre={genre}, username={username}")
+    print(f"Received request: director={director}, username={username}")
 
     if not username:
         return {
@@ -25,7 +25,7 @@ def lambda_handler(event, context):
             }
         }
 
-    if not genre:
+    if not director:
         return {
             'statusCode': 400,
             'body': json.dumps({'error': 'Missing genre in request payload'}),
@@ -41,11 +41,11 @@ def lambda_handler(event, context):
 
     topics=sns_client.list_topics()
     for topic in topics['Topics']:
-        if genre in topic['TopicArn']:
+        if director in topic['TopicArn']:
             topic_arn=topic['TopicArn']
 
     if topic_arn=="":
-        response=sns_client.create_topic(Name=genre)
+        response=sns_client.create_topic(Name=director)
         topic_arn=response['TopicArn']
 
 
@@ -82,7 +82,7 @@ def lambda_handler(event, context):
     # Vraćamo uspešan odgovor
     return {
         'statusCode': 200,
-        'body': json.dumps({'message': f'User {username} successfully subscribed to topic {genre}.'}),
+        'body': json.dumps({'message': f'User {username} successfully subscribed to topic {director}.'}),
         'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True,

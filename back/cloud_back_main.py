@@ -354,6 +354,24 @@ class CloudBackMain(Stack):
         "POST",  # method
         [] # layers
     )
+        
+        subscribe_actor_lambda_function = create_lambda_function(
+        "SubscribeActorFunction",  # id
+        "SubscribeActorFunction",  # name
+        "subscribeActor.lambda_handler",  # handler
+        "subscribeActor",  # include_dir
+        "POST",  # method
+        [] # layers
+    )
+        
+        subscribe_director_lambda_function = create_lambda_function(
+        "SubscribeDirectorFunction",  # id
+        "SubscribeDirectorFunction",  # name
+        "subscribeDirector.lambda_handler",  # handler
+        "subscribeDirector",  # include_dir
+        "POST",  # method
+        [] # layers
+    )
 
 
 
@@ -511,3 +529,11 @@ class CloudBackMain(Stack):
 
         subscribe_genre_integration = apigateway.LambdaIntegration(subscribe_genre_lambda_function)
         self.api.root.add_resource("subscribeGenre").add_method("POST", subscribe_genre_integration)
+
+        subscribe_actor_integration = apigateway.LambdaIntegration(subscribe_actor_lambda_function)
+        self.api.root.add_resource("subscribeActor").add_method("POST", subscribe_actor_integration)
+
+        subscribe_director_integration = apigateway.LambdaIntegration(subscribe_director_lambda_function)
+        self.api.root.add_resource("subscribeDirector").add_method("POST", subscribe_director_integration)
+
+        
