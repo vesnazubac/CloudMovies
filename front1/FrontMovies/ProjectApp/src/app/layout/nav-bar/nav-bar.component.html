@@ -25,6 +25,7 @@
     <button *ngIf="role == 'GUEST'" [routerLink]="['guestsReservations']" mat-raised-button>My Reservations</button>
     <button *ngIf="role == 'ADMIN'" [routerLink]="['accommodationsRequests']" mat-raised-button>Accommodation requests</button>
     <button *ngIf="isAdmin()" [routerLink]="['postMovie']" mat-raised-button>Post movie</button>
+    <button *ngIf="!isAdmin()" [routerLink]="['getTopics']" mat-raised-button>My subscriptions</button>
     <button *ngIf="role == 'ADMIN'" [routerLink]="['users-view']" mat-raised-button>View users</button>
     <button *ngIf="isLoggedIn()" [routerLink]="['editAccount']" mat-raised-button>Edit Account</button>
     <button *ngIf="!isLoggedIn()" [routerLink]="['register']" mat-raised-button>Register</button>

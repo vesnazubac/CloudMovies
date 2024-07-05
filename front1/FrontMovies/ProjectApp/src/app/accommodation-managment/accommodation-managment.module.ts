@@ -25,6 +25,7 @@ import { FavouriteAccommodationsComponent } from './favourite-accommodations/fav
 import { AccommodationComponent } from '../accommodation/accommodation/accommodation.component';
 import { LayoutModule } from '../layout/layout.module';
 import { HttpClientModule } from '@angular/common/http';
+import { MySubscriptionsComponent } from './my-subscriptions/my-subscriptions.component';
 
 
 @NgModule({
@@ -38,7 +39,8 @@ import { HttpClientModule } from '@angular/common/http';
    SearchedAccommodationCardsComponent,
    OwnersAccommodationsComponent,
    AccommodationsReservationsComponent,
-   FavouriteAccommodationsComponent
+   FavouriteAccommodationsComponent,
+   MySubscriptionsComponent
   ],
   imports: [
     CommonModule,
