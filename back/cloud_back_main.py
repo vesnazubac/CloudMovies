@@ -160,14 +160,17 @@ class CloudBackMain(Stack):
                     "cognito-idp:AdminListGroupsForUser",
                     "iam:ListAttachedRolePolicies",
                 "iam:ListRolePolicies",
-                "iam:GetRolePolicy"
+                "iam:GetRolePolicy",
+                 "sns:Subscribe",
+                "sns:ListSubscriptionsByTopic"
                 ],
                 resources=[
                     table.table_arn,
                     f"{bucket.bucket_arn}/*",
                     user_pool.user_pool_arn,
-                    admin_role.role_arn
-                    # Dodajte ostale resurse po potrebi
+                    admin_role.role_arn,
+                    "arn:aws:sns:*:*:*"
+                
                 ]
             )
         )
@@ -237,7 +240,8 @@ class CloudBackMain(Stack):
                     "cognito-idp:GlobalSignOut",  # Dozvola za globalan odjavljivanje korisnika
                     "cognito-idp:AdminAddUserToGroup",
                     "cognito-idp:AdminListGroupsForUser",
-                    "iam:GetRolePolicy"
+                    "iam:GetRolePolicy",
+                    "sns:GetTopicAttributes"
                 ],
                 # resources=[table.table_arn]
                  resources=[
@@ -245,7 +249,8 @@ class CloudBackMain(Stack):
                     f"{bucket.bucket_arn}/*",
                     user_pool.user_pool_arn,
                      f"arn:aws:cognito-idp:{self.region}:{self.account}:userpool/{user_pool.user_pool_id}",
-                     admin_role.role_arn
+                     admin_role.role_arn,
+                     "arn:aws:sns:*:*:*"
                     
                   # bucket.bucket_arn
                 ]
@@ -372,6 +377,15 @@ class CloudBackMain(Stack):
         "POST",  # method
         [] # layers
     )
+        
+        unsubscribe_lambda_function = create_lambda_function(
+                "unsubscribe",  # id
+                "unsubscribeFunction",  # name
+                "unsubscribe.lambda_handler",  # handler
+                "unsubscribe",  # include_dir
+                "POST",  # method
+                []
+            )
 
 
 
@@ -407,6 +421,15 @@ class CloudBackMain(Stack):
             "searchMoviesFunction",
             "searchMovies.lambda_handler",
             "searchMovies",
+            "GET",
+            []
+        )
+
+        get_topics_lambda_function = create_lambda_function(
+            "getTopics",
+            "getTopicsFunction",
+            "getTopics.lambda_handler",
+            "getTopics",
             "GET",
             []
         )
@@ -540,12 +563,21 @@ class CloudBackMain(Stack):
         self.api.root.add_resource("sendEmail").add_method("POST", send_email_integration)
 
         subscribe_genre_integration = apigateway.LambdaIntegration(subscribe_genre_lambda_function)
-        self.api.root.add_resource("subscribeGenre").add_method("POST", subscribe_genre_integration)
+        self.api.root.add_resource("subscribeGenre").add_method("POST", subscribe_genre_integration,authorizer=authorizer)
 
         subscribe_actor_integration = apigateway.LambdaIntegration(subscribe_actor_lambda_function)
-        self.api.root.add_resource("subscribeActor").add_method("POST", subscribe_actor_integration)
+        self.api.root.add_resource("subscribeActor").add_method("POST", subscribe_actor_integration,authorizer=authorizer)
 
         subscribe_director_integration = apigateway.LambdaIntegration(subscribe_director_lambda_function)
-        self.api.root.add_resource("subscribeDirector").add_method("POST", subscribe_director_integration)
+        self.api.root.add_resource("subscribeDirector").add_method("POST", subscribe_director_integration,authorizer=authorizer)
+
+
+        get_topics_integration = apigateway.LambdaIntegration(get_topics_lambda_function) 
+
+        self.api.root.add_resource("getTopics").add_method("GET", get_topics_integration)
 
         
+        unsubscribe_integration = apigateway.LambdaIntegration(unsubscribe_lambda_function)
+        self.api.root.add_resource("unsubscribe").add_method("POST", unsubscribe_integration,authorizer=authorizer)
+
+       

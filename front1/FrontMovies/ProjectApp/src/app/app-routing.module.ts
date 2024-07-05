@@ -32,6 +32,7 @@ import { FavouriteAccommodationsComponent } from './accommodation-managment/favo
 import { OwnerReportComponent } from './owner-report/owner-report.component';
 import { UsersNotificationsComponent } from './users/users-notifications/users-notifications.component';
 import { AccountConfirmationComponent } from './confirmation/account-confirmation/account-confirmation.component';
+import { MySubscriptionsComponent } from './accommodation-managment/my-subscriptions/my-subscriptions.component';
 const routes: Routes = [
   {component: HomeComponent, path:"home"},
   {component:LoginFormComponent, path:"login"},
@@ -39,6 +40,7 @@ const routes: Routes = [
   {component:SuccessComponent, path:"activate/:token"},
   {component:EditAccountComponent,path:"editAccount"},
   {component:CreateMovieComponent,path:"postMovie"},
+  {component:MySubscriptionsComponent,path:"getTopics"},
   {component:EditAccommodationComponent, path:"editAccommodation/:id"},
   {component:CreateReservationComponent, path:"createReservation"},
   {component:EditReservationComponent, path:"editReservation"},

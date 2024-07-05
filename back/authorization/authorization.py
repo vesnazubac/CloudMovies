@@ -23,9 +23,15 @@ def lambda_handler(event,context):
     method_arn = event['methodArn']
 
     if 'Admins' in user_groups:
-        effect = 'Allow'
+        if 'subscribe' in method_arn:
+            effect='Deny'
+        else : 
+            effect = 'Allow'
     else:
-        effect = 'Deny'
+        if 'subscribe' in method_arn:
+            effect='Allow'
+        else:
+            effect = 'Deny'
     
     policy = generate_policy(principal_id, effect, method_arn)
 
