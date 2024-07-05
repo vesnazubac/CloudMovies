@@ -12,6 +12,8 @@ from aws_cdk import (
     aws_stepfunctions_tasks as tasks,
     aws_s3 as s3,
     aws_cognito as cognito,
+    aws_sns as sns,
+    aws_sns_subscriptions as subs
 )
 from constructs import Construct
 from aws_cdk.aws_lambda import LayerVersion 
@@ -344,6 +346,35 @@ class CloudBackMain(Stack):
             resources=[admin_role.role_arn]  # Zamijenite sa odgovarajućom IAM rolu kojoj želite da omogućite GetRolePolicy
         )
     )
+        subscribe_genre_lambda_function = create_lambda_function(
+        "SubscribeGenreFunction",  # id
+        "SubscribeGenreFunction",  # name
+        "subscribeGenre.lambda_handler",  # handler
+        "subscribeGenre",  # include_dir
+        "POST",  # method
+        [] # layers
+    )
+        
+        subscribe_actor_lambda_function = create_lambda_function(
+        "SubscribeActorFunction",  # id
+        "SubscribeActorFunction",  # name
+        "subscribeActor.lambda_handler",  # handler
+        "subscribeActor",  # include_dir
+        "POST",  # method
+        [] # layers
+    )
+        
+        subscribe_director_lambda_function = create_lambda_function(
+        "SubscribeDirectorFunction",  # id
+        "SubscribeDirectorFunction",  # name
+        "subscribeDirector.lambda_handler",  # handler
+        "subscribeDirector",  # include_dir
+        "POST",  # method
+        [] # layers
+    )
+
+
+
         # Kreiranje autorizatora
         authorizer = apigateway.TokenAuthorizer(
             self, "MovieAppAuthorizer",
@@ -410,6 +441,45 @@ class CloudBackMain(Stack):
         resources=[bucket.bucket_arn + "/*"]
     ))
         
+        send_email_lambda_function = create_lambda_function(
+            "SendEmail",   # id
+            "SendEmailFunction",   # name
+            "sendEmail.lambda_handler",   # handler
+            "sendEmail",   # include_dir
+            "POST",   # method (pretpostavljamo da će se koristiti POST metoda za slanje e-pošte)
+            []   # layers (ako su potrebni)
+        )
+
+        
+        drama_topic = sns.Topic(self, "DRAMATopic")
+        drama_topic.add_subscription(subs.LambdaSubscription(send_email_lambda_function))
+
+        komedija_topic=sns.Topic(self,"KOMEDIJATopic")
+        komedija_topic.add_subscription(subs.LambdaSubscription(send_email_lambda_function))
+
+        tragedija_topic=sns.Topic(self,"TRAGEDIJATopic")
+        tragedija_topic.add_subscription(subs.LambdaSubscription(send_email_lambda_function))
+
+
+        # Dodavanje dozvola za pristup IAM resursima
+        send_email_lambda_function.add_to_role_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "ses:SendEmail",   # Akcija za slanje e-pošte preko SES-a
+                    "ses:SendRawEmail" ,  # Akcija za slanje sirove e-pošte preko SES-a
+                    "sns:Publish"
+                ],
+                resources=["*"]   # Zamijenite sa odgovarajućim resursima ili ostavite '' ako je dozvola globalna)
+        )
+        )
+
+
+
+
+
+
+        
         #user_pool.grant_invoke(login_user_lambda_function)
         bucket.add_to_resource_policy(iam.PolicyStatement(
         effect=iam.Effect.ALLOW,
@@ -465,3 +535,17 @@ class CloudBackMain(Stack):
 
         self.api.root.add_resource("getMovie").add_method("GET", get_movie_by_id_integration)
         self.api.root.add_resource("searchMovies").add_method("GET", search_movies_integration)
+
+        send_email_integration = apigateway.LambdaIntegration(send_email_lambda_function)
+        self.api.root.add_resource("sendEmail").add_method("POST", send_email_integration)
+
+        subscribe_genre_integration = apigateway.LambdaIntegration(subscribe_genre_lambda_function)
+        self.api.root.add_resource("subscribeGenre").add_method("POST", subscribe_genre_integration)
+
+        subscribe_actor_integration = apigateway.LambdaIntegration(subscribe_actor_lambda_function)
+        self.api.root.add_resource("subscribeActor").add_method("POST", subscribe_actor_integration)
+
+        subscribe_director_integration = apigateway.LambdaIntegration(subscribe_director_lambda_function)
+        self.api.root.add_resource("subscribeDirector").add_method("POST", subscribe_director_integration)
+
+        

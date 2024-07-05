@@ -6,6 +6,13 @@ import uuid
 
 dynamodb = boto3.resource('dynamodb')
 s3 = boto3.client('s3')
+# Inicijalizacija SNS klijenta'
+sns_client = boto3.client('sns',region_name='eu-central-1')
+# GENRE_TOPIC_ARN = {
+#     'DRAMA': 'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-DRAMATopicC778FD55-x38ZwYOQ9WFM',
+#     'KOMEDIJA': 'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-KOMEDIJATopic604600BE-t7Rn7MMUI0B0', 
+#     'TRAGEDIJA':'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-TRAGEDIJATopicFD1738B9-W1LfKmapMDcO'
+# }
 
 def lambda_handler(event, context):
     try:
@@ -15,7 +22,7 @@ def lambda_handler(event, context):
         # Extract movie data
         id_filma = str(uuid.uuid4())
         naslov = body.get('naslov')
-        zanr = body.get('zanr')
+        zanr = body.get('zanr').lower()
         opis = body.get('opis')
         glumci = body.get('glumci')
         reziser = body.get('reziser')
@@ -51,7 +58,7 @@ def lambda_handler(event, context):
                 'id_filma': id_filma,
                 'naslov': naslov,
                 'zanr': zanr,
-                'glumci': glumci,
+                'glumci': glumci.replace(" ",""),
                 'reziser': reziser,
                 'opis': opis,
 
@@ -66,6 +73,53 @@ def lambda_handler(event, context):
             }
         )
 
+        topics = sns_client.list_topics()
+        actor_topic_arn=""
+
+        for actor in glumci.split(','):
+            actor_topic_name = actor.upper()
+            print(actor_topic_name)
+            for topic in topics['Topics']:
+                if actor_topic_name in topic['TopicArn']:
+                    actor_topic_arn=topic['TopicArn']
+                    print("actor topic arn    ", actor_topic_arn)
+            # Objavljivanje detalja o filmu na temu glumca
+                    sns_client.publish(
+                        TopicArn=actor_topic_arn,
+                        Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
+                        Subject='New Movie Uploaded with your favourite actor '+actor
+                    )
+
+        genre_topic_name = zanr.upper()
+        genre_topic_arn = ""
+        print(genre_topic_name)
+        for topic in topics['Topics']:
+            if genre_topic_name in topic['TopicArn']:
+                genre_topic_arn=topic['TopicArn']
+                print("genre topic arn    ", genre_topic_arn)
+        # Objavljivanje detalja o filmu na temu zanra
+                sns_client.publish(
+                    TopicArn=genre_topic_arn,
+                    Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
+                    Subject='New Movie Uploaded - your favourite genre '+zanr
+                )
+
+
+
+        director_topic_name = reziser.upper()
+        director_topic_arn = ""
+        print(director_topic_name)
+        for topic in topics['Topics']:
+            if director_topic_name in topic['TopicArn']:
+                director_topic_arn=topic['TopicArn']
+                print("director topic arn    ", director_topic_arn)
+        # Objavljivanje detalja o filmu na temu rezisera
+                sns_client.publish(
+                    TopicArn=director_topic_arn,
+                    Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
+                    Subject='New Movie Uploaded - your favourite director '+reziser
+                )
+
         return {
             'statusCode': 200,
             'body': json.dumps({'message': 'Movie data added successfully', 'video_url': s3_url}),
@@ -77,9 +131,8 @@ def lambda_handler(event, context):
             }
         }
     except Exception as e:
-        # Log error
         print(f"An error occurred: {e}")
-        # Return error response
+      
         return {
             'statusCode': 500,
             'body': json.dumps({'error': str(e)}),

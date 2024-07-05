@@ -46,6 +46,9 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
   movie:MovieGetDTO;
   s3Url:string;
   _response:any;
+
+  actorsDataSource: MatTableDataSource<string>;
+  displayedColumns: string[] = ['Name', 'actions'];
   
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -88,6 +91,11 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
           if (this.movie && this.movie.s3_url) {
             this.s3Url = this.movie.s3_url.trim();
           }
+
+          if (this.movie && this.movie.glumci) {
+            const actorsList = this.movie.glumci.split(',');
+            this.actorsDataSource = new MatTableDataSource<string>(actorsList);
+          }
           
         },
         (error: any) => {
@@ -96,6 +104,86 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
       );
     });
   }
+
+subscribeActor(actor:string){
+
+  const username = localStorage.getItem('username'); // Dohvati korisničko ime iz Local Storage-a
+  if (!username) {
+    console.error('Username not found in Local Storage.');
+    return;
+  }
+
+  const data = {
+    username: username,
+    actor:actor
+    
+  };
+  console.log("USENRAME ", username)
+  console.log("ACTOR   ",actor)
+  this.http.post<any>(`${environment.cloudHost}subscribeActor`, data).subscribe(
+    response => {
+      console.log(`Subscribed to ${actor} successfully:`, response);
+      this.openSnackBar('Uspesna pretplata na glumca!');
+    },
+    error => {
+      console.error(`Subscription to ${actor} failed:`, error);
+    }
+  );
+
+}
+
+subscribeDirector(director:string|undefined){
+  const username = localStorage.getItem('username'); // Dohvati korisničko ime iz Local Storage-a
+  if (!username) {
+    console.error('Username not found in Local Storage.');
+    return;
+  }
+
+  const data = {
+    username: username,
+    director : director
+    
+  };
+  console.log("USENRAME ", username)
+  console.log("DIRECTOR   ",director)
+  this.http.post<any>(`${environment.cloudHost}subscribeDirector`, data).subscribe(
+    response => {
+      console.log(`Subscribed to ${director} successfully:`, response);
+      this.openSnackBar('Uspesna pretplata!');
+    },
+    error => {
+      console.error(`Subscription to ${director} failed:`, error);
+    }
+  );
+
+}
+
+
+subscribeGenre(genre: string | undefined): void {
+  const username = localStorage.getItem('username'); // Dohvati korisničko ime iz Local Storage-a
+  if (!username) {
+    console.error('Username not found in Local Storage.');
+    return;
+  }
+
+  const data = {
+    username: username,
+    genre: genre
+    
+  };
+  console.log("USENRAME ", username)
+  console.log("GENRE   ",genre)
+  this.http.post<any>(`${environment.cloudHost}subscribeGenre`, data).subscribe(
+    response => {
+      console.log(`Subscribed to ${genre} successfully:`, response);
+      this.openSnackBar('Uspesna pretplata!');
+    },
+    error => {
+      console.error(`Subscription to ${genre} failed:`, error);
+    }
+  );
+}
+
   goBack() {
     this.router.navigate(['/home']);
   }
