@@ -103,10 +103,31 @@ subscribeDirector(director:string|undefined){
 
 }
 
-subscribeGenre(genre:string|undefined){
 
+subscribeGenre(genre: string | undefined): void {
+  const username = localStorage.getItem('username'); // Dohvati korisničko ime iz Local Storage-a
+  if (!username) {
+    console.error('Username not found in Local Storage.');
+    return;
+  }
+
+  const data = {
+    username: username,
+    genre: genre
+    
+  };
+  console.log("USENRAME ", username)
+  console.log("GENRE   ",genre)
+  this.http.post<any>(`${environment.cloudHost}subscribeGenre`, data).subscribe(
+    response => {
+      console.log(`Subscribed to ${genre} successfully:`, response);
+      this.openSnackBar('Uspesna pretplata!');
+    },
+    error => {
+      console.error(`Subscription to ${genre} failed:`, error);
+    }
+  );
 }
-
 
   goBack() {
     this.router.navigate(['/home']);

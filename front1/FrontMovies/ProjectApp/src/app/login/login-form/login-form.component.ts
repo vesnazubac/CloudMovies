@@ -83,6 +83,7 @@ export class LoginFormComponent {
               localStorage.setItem('Group',groups);
 
               const username = session.getIdToken().payload['email'];
+              localStorage.setItem('username',username)
               console.log('Username : ',username)
             
               this.router.navigate(["/home"])

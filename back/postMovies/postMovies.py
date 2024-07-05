@@ -3,9 +3,19 @@ import boto3
 import base64
 import os
 import uuid
-
+#from aws_cdk import aws_sns as sns
+#from cloud_back_main import sns
+#import aws_cdk.aws_sns as sns
+import aws_sns as sns
 dynamodb = boto3.resource('dynamodb')
 s3 = boto3.client('s3')
+# Inicijalizacija SNS klijenta'
+sns_client = boto3.client('sns')
+GENRE_TOPIC_ARN = {
+    'DRAMA': 'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-DRAMATopicC778FD55-x38ZwYOQ9WFM',
+    'KOMEDIJA': 'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-KOMEDIJATopic604600BE-t7Rn7MMUI0B0', 
+    'TRAGEDIJA':'arn:aws:sns:eu-central-1:975050364245:CloudBackMain-TRAGEDIJATopicFD1738B9-W1LfKmapMDcO'
+}
 
 def lambda_handler(event, context):
     try:
@@ -15,7 +25,7 @@ def lambda_handler(event, context):
         # Extract movie data
         id_filma = str(uuid.uuid4())
         naslov = body.get('naslov')
-        zanr = body.get('zanr')
+        zanr = body.get('zanr').lower()
         opis = body.get('opis')
         glumci = body.get('glumci')
         reziser = body.get('reziser')
@@ -66,6 +76,44 @@ def lambda_handler(event, context):
             }
         )
 
+        for actor in glumci.split(','):
+            #pass
+            actor_topic_name = f"ActorTopic-{actor.strip()}"
+            actor_topic_arn = find_or_create_topic(actor_topic_name)
+
+            # Objavljivanje detalja o filmu na temu glumca
+            sns_client.publish(
+                TopicArn=actor_topic_arn,
+                Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
+                Subject='New Movie Uploaded with your favourite actor '+actor
+            )
+
+
+        topic_arn = GENRE_TOPIC_ARN[zanr.upper()]
+        if zanr == 'drama':
+           
+            if topic_arn:
+                sns_client.publish(
+                    TopicArn=topic_arn,
+                    Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
+                    Subject='New Drama Movie Uploaded - your favourite genre : DRAMA',
+                )
+        elif zanr=='komedija':
+            if topic_arn:
+                sns_client.publish(
+                    TopicArn=topic_arn,
+                    Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
+                    Subject='New Drama Movie Uploaded - your favourite genre : COMEDY',
+                )
+        elif zanr=='tragedija':
+            if topic_arn:
+                sns_client.publish(
+                    TopicArn=topic_arn,
+                    Message=json.dumps({'id_filma': id_filma, 'naslov': naslov, 's3_url': s3_url}),
+                    Subject='New Drama Movie Uploaded - your favourite genre : TRAGEDY',
+                )
+
+
         return {
             'statusCode': 200,
             'body': json.dumps({'message': 'Movie data added successfully', 'video_url': s3_url}),
@@ -90,3 +138,21 @@ def lambda_handler(event, context):
                 'Access-Control-Allow-Headers': 'Content-Type, Authorization'
             }
         }
+
+def find_or_create_topic(topic_name):
+    # Proverava da li postoji tema sa datim imenom, ako ne postoji, kreira je
+    try:
+        response = sns.Topic(Name=topic_name)
+        return response['TopicArn']
+    except sns.exceptions.TopicLimitExceededException:
+        # Ako postoji limit na broj tema, potrebno je implementirati logiku za upravljanje tim limitom
+        raise Exception("Topic limit exceeded. Unable to create new topic.")
+    except sns.exceptions.InvalidParameterValueException:
+        # Ako tema sa datim imenom već postoji, vraća njen ARN
+        topic_list = sns.list_topics()['Topics']
+        for topic in topic_list:
+            if topic_name in topic['TopicArn']:
+                return topic['TopicArn']
+        raise Exception("Failed to find or create topic.")
+
+
