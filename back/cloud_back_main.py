@@ -44,17 +44,17 @@ class CloudBackMain(Stack):
             table_name='SearchMoviesTable'
         )
 
-        # records_table = dynamodb.Table.from_table_name(
-        #     self, 'FeedRecordsTable',
-        #     table_name='FeedRecordsTable' 
-        # )
-
-        records_table=dynamodb.Table(
-            self,'FeedRecordsTable',
-            table_name='FeedRecordsTable',
-            partition_key={'name': 'id_filma', 'type': dynamodb.AttributeType.STRING},
-            sort_key={'name': 'username', 'type': dynamodb.AttributeType.STRING},
+        records_table = dynamodb.Table.from_table_name(
+            self, 'FeedRecordsTable',
+            table_name='FeedRecordsTable' 
         )
+
+        # records_table=dynamodb.Table(
+        #     self,'FeedRecordsTable',
+        #     table_name='FeedRecordsTable',
+        #     partition_key={'name': 'id_filma', 'type': dynamodb.AttributeType.STRING},
+        #     sort_key={'name': 'username', 'type': dynamodb.AttributeType.STRING},
+        # )
 
 
           # Kreiranje S3 bucketa
@@ -621,7 +621,7 @@ class CloudBackMain(Stack):
 
        
         post_record_integration = apigateway.LambdaIntegration(post_record_lambda_function)
-        self.api.root.add_resource("postRecord").add_method("POST", post_record_integration)
+        self.api.root.add_resource("postRecord").add_method("POST", post_record_integration,authorizer=authorizer)
 
 
         get_records_integration = apigateway.LambdaIntegration(get_records_lambda_function)
