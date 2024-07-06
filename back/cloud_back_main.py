@@ -43,6 +43,20 @@ class CloudBackMain(Stack):
             self, 'SearchMoviesTable',
             table_name='SearchMoviesTable'
         )
+
+        # records_table = dynamodb.Table.from_table_name(
+        #     self, 'FeedRecordsTable',
+        #     table_name='FeedRecordsTable' 
+        # )
+
+        records_table=dynamodb.Table(
+            self,'FeedRecordsTable',
+            table_name='FeedRecordsTable',
+            partition_key={'name': 'id_filma', 'type': dynamodb.AttributeType.STRING},
+            sort_key={'name': 'username', 'type': dynamodb.AttributeType.STRING},
+        )
+
+
           # Kreiranje S3 bucketa
         bucket = s3.Bucket(self, "moviesbucket",
                            removal_policy=RemovalPolicy.DESTROY,  # Za razvojno okruženje, uklonite za produkciju
@@ -245,6 +259,7 @@ class CloudBackMain(Stack):
                 ],
                 # resources=[table.table_arn]
                  resources=[
+                    records_table.table_arn,
                     table.table_arn,
                     f"{bucket.bucket_arn}/*",
                     user_pool.user_pool_arn,
@@ -274,7 +289,8 @@ class CloudBackMain(Stack):
                     'BUCKET_NAME': bucket.bucket_name,
                     'USER_POOL_ID':user_pool.user_pool_id,
                     'S3_BUCKET_ARN': bucket.bucket_arn,
-                    'DYNAMODB_TABLE_ARN': table.table_arn
+                    'DYNAMODB_TABLE_ARN': table.table_arn,
+                    'FEED_RECORDS_TABLE_NAME': records_table.table_name
  
                 },
                 role=lambda_role
@@ -386,6 +402,17 @@ class CloudBackMain(Stack):
                 "POST",  # method
                 []
             )
+        
+
+        post_record_lambda_function = create_lambda_function(
+            "postRecord",  # id
+            "postRecordFunction",  # name
+            "postRecord.lambda_handler",  # handler
+            "postRecord",  # include_dir
+            "POST",  # method
+            []  # layers
+        )
+
 
 
 
@@ -452,6 +479,15 @@ class CloudBackMain(Stack):
             []
         )
 
+        get_records_lambda_function = create_lambda_function(
+            "getRecords",
+            "getRecordsFunction",
+            "getRecords.lambda_handler",
+            "getRecords",
+            "GET",
+            []
+        )
+
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
         table.grant_write_data(post_movie_lambda_function)
@@ -463,6 +499,9 @@ class CloudBackMain(Stack):
         principals=[lambda_role],
         resources=[bucket.bucket_arn + "/*"]
     ))
+        
+        records_table.grant_write_data(post_record_lambda_function)
+        records_table.grant_read_data(get_records_lambda_function)
         
         send_email_lambda_function = create_lambda_function(
             "SendEmail",   # id
@@ -581,3 +620,9 @@ class CloudBackMain(Stack):
         self.api.root.add_resource("unsubscribe").add_method("POST", unsubscribe_integration,authorizer=authorizer)
 
        
+        post_record_integration = apigateway.LambdaIntegration(post_record_lambda_function)
+        self.api.root.add_resource("postRecord").add_method("POST", post_record_integration)
+
+
+        get_records_integration = apigateway.LambdaIntegration(get_records_lambda_function)
+        self.api.root.add_resource("getRecords").add_method("GET", get_records_integration)
