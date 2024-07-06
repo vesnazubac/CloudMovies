@@ -9,19 +9,36 @@
   </div>
   
   <div class="content">
-    <p><strong>Actors:</strong> {{ movie?.glumci }}</p>
-    <p><strong>Description:</strong> {{ movie?.opis }}</p>
-    <p><strong>Director:</strong> {{ movie?.reziser }}<button mat-button style="margin-left: 20px;" (click)="subscribeDirector(movie?.reziser)">
+    <p style="margin-left: 2%;"><strong>Actors:</strong> {{ movie?.glumci }}</p>
+    <p style="margin-left: 2%;"><strong>Description:</strong> {{ movie?.opis }}</p>
+    <p style="margin-left: 2%;"><strong>Director:</strong> {{ movie?.reziser }}<button mat-button style="margin-left: 20px;" (click)="subscribeDirector(movie?.reziser)">
       <mat-icon>notifications</mat-icon>
       Subscribe on {{movie?.reziser}}
     </button> </p>
-    <p><strong>Genre:</strong> {{ movie?.zanr }}  <button mat-button style="margin-left: 20px;" (click)="subscribeGenre(movie?.zanr)">
+    <p style="margin-left: 2%;"><strong>Genre:</strong> {{ movie?.zanr }}  <button mat-button style="margin-left: 20px;" (click)="subscribeGenre(movie?.zanr)">
       <mat-icon>notifications</mat-icon>
       Subscribe on {{movie?.zanr}}
     </button>  </p>
+
+
+    <p *ngIf="averageRating !== undefined" style="margin-top: 2%; margin-left:2%"><strong>Average Rating:</strong> {{ averageRating }}</p>
+
+    <!-- Vaša ocena filma ako postoji -->
+    <!-- <p *ngIf="myRating !== undefined"><strong>My Rating:</strong> {{ myRating }}</p> -->
+
     <!-- <button (click)="goBack()" style=" margin-left: 100%;">
       <mat-icon>arrow_back</mat-icon>
     </button> -->
+
+    <div style="margin-top: 20px; margin-left: 2%;">
+      <h3><strong>Rate this Movie</strong></h3>
+      <mat-radio-group aria-label="Select an option" [(ngModel)]="rating">
+        <mat-radio-button value="1">1</mat-radio-button>
+        <mat-radio-button value="2" style="margin-left: 10px;">2</mat-radio-button>
+        <mat-radio-button value="3" style="margin-left: 10px;">3</mat-radio-button>
+      </mat-radio-group>
+      <button mat-button style="margin-left: 20px;" (click)="submitRating()">Submit Rating</button>
+    </div>
 
     <button (click)="play()" class="action-button play-button" style=" margin-left: 70%;margin-top: 20%;">
       <mat-icon>play_arrow</mat-icon> Play Movie

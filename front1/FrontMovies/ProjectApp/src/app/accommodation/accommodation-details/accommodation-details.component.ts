@@ -30,13 +30,15 @@ import { MovieGetDTO } from 'src/app/models/movieGetDTO.model';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/env/env';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
+import { MatRadioModule } from '@angular/material/radio';
+import { FormsModule } from '@angular/forms';
+import { RecordPostDTO } from './recordPost';
 @Component({
     selector: 'app-accommodation-details',
     templateUrl: './accommodation-details.component.html',
     styleUrls: ['./accommodation-details.component.css'],
     standalone: true,
-    imports: [ReactiveFormsModule,MatChipsModule,MatPaginatorModule, MatIconModule,MatTableModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatListModule, CommonModule, LayoutModule, ReservationComponent]
+    imports: [FormsModule,MatRadioModule,ReactiveFormsModule,MatChipsModule,MatPaginatorModule, MatIconModule,MatTableModule, MatInputModule, MatFormFieldModule, MatButtonModule, MatListModule, CommonModule, LayoutModule, ReservationComponent]
 })
 export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
 
@@ -46,6 +48,14 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
   movie:MovieGetDTO;
   s3Url:string;
   _response:any;
+
+  rating: number = 1;
+
+  movie_id:string;
+  movie_naslov:string;
+
+  averageRating:number=0;
+
 
   actorsDataSource: MatTableDataSource<string>;
   displayedColumns: string[] = ['Name', 'actions'];
@@ -90,12 +100,17 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
           this._response=response
           if (this.movie && this.movie.s3_url) {
             this.s3Url = this.movie.s3_url.trim();
+            this.movie_id=this.movie.id_filma
+            console.log("ID FILMA : ",this.movie_id)
+            this.movie_naslov=this.movie.naslov
+            console.log("NASLOV FILMA : ",this.movie_naslov)
           }
 
           if (this.movie && this.movie.glumci) {
             const actorsList = this.movie.glumci.split(',');
             this.actorsDataSource = new MatTableDataSource<string>(actorsList);
           }
+          this.rateAverageGrade();
           
         },
         (error: any) => {
@@ -422,6 +437,19 @@ subscribeGenre(genre: string | undefined): void {
             closeButton?.addEventListener('click', () => {
               document.body.removeChild(modalContent);
             });
+
+
+
+            const username=localStorage.getItem('username')
+
+          if (username === null) {
+            console.error('Username is not set in localStorage');
+            return;
+          }
+          const record = new RecordPostDTO(username, 'view', 0,this.movie_id,this.movie_naslov);
+        
+
+
           } else {
             console.error(`Invalid S3 URL for movie with id ${this.movie.id_filma}`);
           }
@@ -477,7 +505,19 @@ subscribeGenre(genre: string | undefined): void {
         window.URL.revokeObjectURL(url);
   
         // Zabeležite preuzimanje
-        this.recordDownload();
+
+        const username=localStorage.getItem('username')
+
+        if (username === null) {
+          console.error('Username is not set in localStorage');
+          return;
+        }
+        const record = new RecordPostDTO(username, 'download', 0,this.movie_id,this.movie_naslov);
+      
+
+      
+      
+      
       },
       (error: HttpErrorResponse) => {
         // Obradite greške
@@ -519,6 +559,78 @@ subscribeGenre(genre: string | undefined): void {
     //   }
     // );
   }
+
+
+  submitRating(){
+    console.log('Rating submitted:', this.rating);
+    
+    const username=localStorage.getItem('username')
+
+    if (username === null) {
+      console.error('Username is not set in localStorage');
+      return;
+    }
+
+    const record = new RecordPostDTO(username, 'rate', this.rating,this.movie_id,this.movie_naslov);
+
+    console.log(record);
+
+    this.http.post<any>(`${environment.cloudHost}postRecord`, record, {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    }).subscribe(
+      response => {
+        console.log('Zapis uspesno dodat:', response);
+        this.openSnackBar('Uspesno dodata ocena!');
+       
+      },
+      error => {
+        console.error('Greška prilikom ubacivanja zapisa:', error);
+      
+      }
+    );
+  
+  }
+
+
+  rateAverageGrade() {
+    let sum = 0;
+    let count = 0;
+  
+    this.http.get<any[]>(`${environment.cloudHost}getRecords`).subscribe(
+      records => {
+        console.log('Svi zapisi:', records);
+  
+        records.forEach(record => {
+          // Provera uslova
+          if (
+              record.id_filma === this.movie_id &&
+              record.naslov === this.movie_naslov &&
+              record.type === 'rate') {
+            
+            sum += parseInt(record.content, 10); 
+
+            count++;
+          }
+        });
+
+        console.log("Suma  ",sum)
+        console.log("Count  ",count)
+  
+        // Prosečna ocena
+        this.averageRating = count > 0 ? sum / count : 0;
+        console.log('Prosečna ocena filma:', this.averageRating);
+
+       
+        
+      },
+      error => {
+        console.error('Greška prilikom dohvatanja zapisa:', error);
+      }
+    );
+  }
+
 }
 
 

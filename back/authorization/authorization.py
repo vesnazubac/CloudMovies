@@ -23,12 +23,12 @@ def lambda_handler(event,context):
     method_arn = event['methodArn']
 
     if 'Admins' in user_groups:
-        if 'subscribe' in method_arn:
+        if 'subscribe' in method_arn or 'postRecord' in method_arn:
             effect='Deny'
         else : 
             effect = 'Allow'
     else:
-        if 'subscribe' in method_arn:
+        if 'subscribe' in method_arn or 'Record' in method_arn:
             effect='Allow'
         else:
             effect = 'Deny'
