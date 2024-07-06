@@ -128,7 +128,13 @@ class CloudBackMain(Stack):
                 "sts:AssumeRoleWithWebIdentity"
             )
         )
-
+        layer_policy_statement = iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["lambda:GetLayerVersion"],
+            resources=["arn:aws:lambda:eu-central-1:590183980405:layer:ffmpeg:1"]
+        )
+        admin_role.add_to_policy(layer_policy_statement)
+        user_role.add_to_policy(layer_policy_statement)
         # Dodavanje dozvola IAM ulozi za običnog korisnika
         user_role.add_to_policy(
             iam.PolicyStatement(
@@ -316,7 +322,14 @@ class CloudBackMain(Stack):
         "POST",  # method (pretpostavljamo da se koristi POST za login)
         []
         )
-        
+        change_resolution_lambda_function = create_lambda_function(
+            "changeResolution",
+            "changeResolutionFunction",
+            "changeResolution.lambda_handler",
+            "changeResolution",
+            "POST", # valjda je POST nzm
+            layers=[]#[ _lambda.LayerVersion.from_layer_version_arn(self, 'ffmpeg','arn:aws:lambda:eu-central-1:590183980405:layer:ffmpeg:1'),]
+        )
         util_layer = LayerVersion(
             self, 'UtilLambdaLayer',
             code=_lambda.Code.from_asset('libs'),
@@ -413,9 +426,81 @@ class CloudBackMain(Stack):
             []  # layers
         )
 
+        # split_resolutions_lambda = _lambda.Function(
+        #     self, "splitResolutionsFunction",
+        #     handler="split_resolutions.lambda_handler",
+        #     layers=[]
+        # )
 
+        # split_task = tasks.LambdaInvoke(
+        #     self, "SplitResolutions",
+        #     lambda_function=split_resolutions_lambda,
+        #     output_path="$.Payload"
+        # )
+        # transcode_720p_task = tasks.LambdaInvoke(
+        #     self, "TranscodeAndUpload720p",
+        #     lambda_function=change_resolution_lambda_function,
+        #     payload=sfn.TaskInput.from_object({
+        #         "original_key": sfn.JsonPath.string_at("$.original_key"),
+        #         "target_resolution": 720
+        #     }),
+        #     result_path="$.transcode720p"
+        # ).add_retry(
+        #     max_attempts=3,
+        #     interval=Duration.seconds(5)
+        # )
 
+        # transcode_480p_task = tasks.LambdaInvoke(
+        #     self, "TranscodeAndUpload480p",
+        #     lambda_function=change_resolution_lambda_function,
+        #     payload=sfn.TaskInput.from_object({
+        #         "original_key": sfn.JsonPath.string_at("$.original_key"),
+        #         "target_resolution": 480
+        #     }),
+        #     result_path="$.transcode480p"
+        # ).add_retry(
+        #     max_attempts=3,
+        #     interval=Duration.seconds(5)
+        # )
 
+        # transcode_360p_task = tasks.LambdaInvoke(
+        #     self, "TranscodeAndUpload360p",
+        #     lambda_function=change_resolution_lambda_function,
+        #     payload=sfn.TaskInput.from_object({
+        #         "original_key": sfn.JsonPath.string_at("$.original_key"),
+        #         "target_resolution": 360
+        #     }),
+        #     result_path="$.transcode360p"
+        # ).add_retry(
+        #     max_attempts=3,
+        #     interval=Duration.seconds(5)
+        # )
+        # parallel_transcode = sfn.Parallel(self, "ParallelTranscode")
+        # parallel_transcode.branch(transcode_720p_task)
+        # parallel_transcode.branch(transcode_480p_task)
+        # parallel_transcode.branch(transcode_360p_task)
+
+        # definition = split_task.next(parallel_transcode)
+
+        # state_machine = sfn.StateMachine(
+        #     self, "VideoProcessingStateMachine",
+        #     definition_body=sfn.DefinitionBody.from_chainable(definition),
+        #     timeout=Duration.minutes(10)
+        # )
+
+        # start_step_function_lambda = _lambda.Function(
+        #     self, "StartSplittingResolutionsFunctionExecution",
+        #     runtime=_lambda.Runtime.PYTHON_3_12,
+        #     handler="startSplittingResolutions/start_splitting_resolutions.handler",
+        #     memory_size=128,
+        #     timeout=Duration.seconds(10),
+        #     environment={
+        #         "STATE_MACHINE_ARN": state_machine.state_machine_arn
+        #     }
+        # )
+        # state_machine.grant_start_execution(start_step_function_lambda)
+
+        
         # Kreiranje autorizatora
         authorizer = apigateway.TokenAuthorizer(
             self, "MovieAppAuthorizer",
@@ -434,7 +519,7 @@ class CloudBackMain(Stack):
                                         "allow_methods": apigateway.Cors.ALL_METHODS, 
                                     }
                                     )
-     
+        
         register_user_lambda_function = create_lambda_function(
             "RegisterUser",  # id
             "RegisterUserFunction",  # name
@@ -554,6 +639,7 @@ class CloudBackMain(Stack):
         bucket.grant_write(post_movie_lambda_function)
         bucket.grant_read(get_movie_by_id_lambda_function)
         bucket.grant_read(get_movie_lambda_function)
+        bucket.grant_read_write(change_resolution_lambda_function)
         search_table.grant_read_data(search_movies_lambda_function)
 
         register_user_integration = apigateway.LambdaIntegration(register_user_lambda_function)
@@ -571,6 +657,8 @@ class CloudBackMain(Stack):
         post_movies_integration = apigateway.LambdaIntegration(post_movie_lambda_function)
         get_movie_by_id_integration = apigateway.LambdaIntegration(get_movie_by_id_lambda_function)
         search_movies_integration = apigateway.LambdaIntegration(search_movies_lambda_function)
+        change_resolution_integration = apigateway.LambdaIntegration(change_resolution_lambda_function)
+        self.api.root.add_resource("changeResolution").add_method("POST",change_resolution_integration)
         #Ova metoda kreira novi resurs movies. To znači da će URL za ovaj resurs biti /movies.
         #To znači da će se, kada API Gateway primi GET zahtev na /movies, pozvati get_movie_lambda_function.
         self.api.root.add_resource("movies").add_method("GET", get_movies_integration) #Ova metoda dodaje novi resurs pod nazivom movies na root nivou API-ja.
@@ -591,6 +679,11 @@ class CloudBackMain(Stack):
 
         # # Add POST method to the existing movies resource
         # moviesResource.add_method("POST", post_movies_integration)
+        # transcode_resource = self.api.root.add_resource("transcode")
+        # transcode_resource.add_method("PUT", apigateway.LambdaIntegration(start_step_function_lambda),
+        #                           authorization_type=apigateway.AuthorizationType.COGNITO,
+        #                           authorizer=authorizer,
+        #                           )
  
         self.api.root.add_resource("postMovies").add_method("POST", post_movies_integration,authorizer=authorizer)
 
