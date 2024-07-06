@@ -1,7 +1,7 @@
 export class RecordPostDTO {
   username: string|null;
   type: string;
-  content: number;  //za slucaj ocene
+  content: number;  
   id_filma:string;
   naslov:string;
 

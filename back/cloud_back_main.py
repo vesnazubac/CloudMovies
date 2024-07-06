@@ -60,7 +60,7 @@ class CloudBackMain(Stack):
         # dv_table=dynamodb.Table(  #downloads - view table
         #     self,'DVTable',
         #     table_name='DVTable',
-        #     partition_key={'name': 'id_filma', 'type': dynamodb.AttributeType.STRING},
+        #     partition_key={'name': 'username', 'type': dynamodb.AttributeType.STRING},
         #     sort_key={'name': 'timestamp', 'type': dynamodb.AttributeType.STRING},
         # )
 
@@ -511,6 +511,15 @@ class CloudBackMain(Stack):
             []
         )
 
+        get_dvs_lambda_function = create_lambda_function(
+            "getUserDVS",
+            "getUserDVSFunction",
+            "getUserDVS.lambda_handler",
+            "getUserDVS",
+            "GET",
+            []
+        )
+
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
         table.grant_write_data(post_movie_lambda_function)
@@ -527,7 +536,7 @@ class CloudBackMain(Stack):
         records_table.grant_read_data(get_records_lambda_function)
 
         dv_table.grant_write_data(post_dv_lambda_function)
-        # dv_table.grant_read_data(get_dvs_lambda_function)
+        dv_table.grant_read_data(get_dvs_lambda_function)
 
        
         
@@ -601,6 +610,8 @@ class CloudBackMain(Stack):
         search_movies_integration = apigateway.LambdaIntegration(search_movies_lambda_function)
         #Ova metoda kreira novi resurs movies. To znači da će URL za ovaj resurs biti /movies.
         #To znači da će se, kada API Gateway primi GET zahtev na /movies, pozvati get_movie_lambda_function.
+        
+        get_movies_integration = apigateway.LambdaIntegration(get_movie_lambda_function) #integracija izmedju lambda fje i API gateway-a, sto znaci da API Gateway može pozivati Lambda funkciju kao odgovor na HTTP zahteve. 
         self.api.root.add_resource("movies").add_method("GET", get_movies_integration) #Ova metoda dodaje novi resurs pod nazivom movies na root nivou API-ja.
 
 
@@ -657,3 +668,6 @@ class CloudBackMain(Stack):
 
         post_dv_integration = apigateway.LambdaIntegration(post_dv_lambda_function)
         self.api.root.add_resource("postDV").add_method("POST", post_dv_integration)
+
+        get_dvs_integration = apigateway.LambdaIntegration(get_dvs_lambda_function)
+        self.api.root.add_resource("getUserDVS").add_method("GET", get_dvs_integration)

@@ -48,10 +48,11 @@ def lambda_handler(event, context):
             'statusCode': 200,
             'body': json.dumps(items),
               'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': True,
-                'Access-Control-Allow-Methods':"GET,OPTIONS"
-            }
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True,
+            'Access-Control-Allow-Methods': "GET,POST,OPTIONS,PUT",
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
         }
     except Exception as e:
         # Vraćanje greške ako dođe do problema
@@ -59,7 +60,9 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'body': json.dumps(str(e)),
               'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': True
-            }
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': True,
+            'Access-Control-Allow-Methods': "GET,POST,OPTIONS,PUT",
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+        }
         }
