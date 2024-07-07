@@ -2,9 +2,9 @@ import json
 import subprocess
 import os
 import logging
-import uuid
 import boto3
 
+sqs_client = boto3.client('sqs')
 s3_client = boto3.client('s3')
 s3_resource = boto3.resource('s3')
 
@@ -13,51 +13,73 @@ logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     try:
-        # Load request body
-        body = json.loads(event['body'])
-        
-        # Extract movie data
-        id_filma = body.get('id_filma')
-        file_type = body.get('file_type')
-        file_name = body.get('file_name')
-        target_resolution = body.get('target_resolution')
+        # Read messages from SQS
+        messages = sqs_client.receive_message(
+            QueueUrl='https://sqs.eu-central-1.amazonaws.com/975050364245/MyAWSQueue',
+            MaxNumberOfMessages=3,
+            VisibilityTimeout=30,
+            WaitTimeSeconds=20
+        )
 
-        # Validate required fields
-        if not id_filma:
-            raise ValueError("Missing required fields")
-        bucket_name = os.environ['BUCKET_NAME']
+        if 'Messages' in messages:
+            for message in messages['Messages']:
+                # Extract message body
+                message_body = json.loads(message['Body'])
 
-        resolutions = {
-        720: 1080,
-        480: 720,
-        360: 480
-        }
-        
-        if target_resolution not in resolutions:
-            resolution = [-1, target_resolution]
-        else:
-            resolution = [resolutions[target_resolution], target_resolution]
+                # Extract movie data from message
+                id_filma = message_body.get('id_filma')
+                file_type = message_body.get('file_type')
+                file_name = message_body.get('file_name')
+                target_resolution = message_body.get('resolution')
 
-        output_prefix = f"{id_filma}/"
-        
+                # Validate required fields
+                if not id_filma or not file_type or not file_name or not target_resolution:
+                    logger.error(f"Invalid message format: {message_body}")
+                    continue
 
-        download_dir = '/tmp'
-        os.makedirs(download_dir, exist_ok=True)
+                # Download original video file from S3
+                bucket_name = os.environ['BUCKET_NAME']
+                download_dir = '/tmp'
+                os.makedirs(download_dir, exist_ok=True)
+                download_path = os.path.join(download_dir, file_name)
+                s3_client.download_file(bucket_name, id_filma, download_path)
 
-        download_path = os.path.join(download_dir, file_name)
-        s3_client.download_file(bucket_name, id_filma, download_path)
+                # Transcode video to the target resolution
+                resolutions = {
+                    720: '1080p',
+                    480: '720p',
+                    360: '480p'
+                }
+                output_prefix = f"{id_filma}/"
+                output_path = f'/tmp/{resolutions[target_resolution]}.{file_type}'
 
-        output_path = f'/tmp/{resolution[1]}.{file_type}'
+                cmd = f'ffmpeg -y -i {download_path} -vf "scale={target_resolution}:trunc(ow/a/2)*2" -c:a copy {output_path}'
+                result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
 
-        cmd = f'ffmpeg -y -i {download_path} -vf "scale={resolution[0]}:{resolution[1]}" -c:a copy {output_path}'
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+                if result.returncode != 0:
+                    logger.error(f"Error transcoding video: {result.stderr}")
+                    continue
 
-        if result.returncode != 0:
-            return {
-            'statusCode': 500,
-            'body': json.dumps({'error': 'Error getting video information with ffprobe','message': f'{result.stderr}', 'path':download_path,
-                                'output':output_path}),
-        
+                # Upload transcoded video to S3
+                transcoded_key = f'{output_prefix}{resolutions[target_resolution]}.{file_type}'
+                with open(output_path, "rb") as f:
+                    s3_client.put_object(Bucket=bucket_name, Key=transcoded_key, Body=f)
+                    logger.info(f"Transcoded video uploaded to S3: {transcoded_key}")
+
+                # Clean up temporary files
+                os.remove(download_path)
+                os.remove(output_path)
+
+                # Delete message from SQS queue
+                sqs_client.delete_message(
+                    QueueUrl='https://sqs.eu-central-1.amazonaws.com/975050364245/MyAWSQueue',
+                    ReceiptHandle=message['ReceiptHandle']
+                )
+                logger.info(f"Processed and deleted message from SQS: {message['MessageId']}")
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'message': 'Transcoding process completed'}),
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True,
@@ -65,35 +87,9 @@ def lambda_handler(event, context):
                 'Access-Control-Allow-Headers': 'Content-Type, Authorization'
             }
         }
-        
-        transcoded_key = f'{output_prefix}{resolution[1]}.{file_type}'
-        logger.info(f"output_path: {output_path}")
-        logger.info(f"bucket: {bucket_name}")
-        logger.info(f"transcoded_key: {transcoded_key}")
-
-        # # Use s3.put_object to upload the file
-        with open(output_path, "rb") as f:
-            s3_client.put_object(Bucket=bucket_name, Key=transcoded_key, Body=f)
-            logger.info(f"File uploaded to S3 at {transcoded_key}")
-
-        # os.remove(download_path)
-        # os.remove(output_path)
-
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'message': 'Movie data changed successfully','download_path':download_path,'output_prefix':output_prefix,'resolution':resolution,
-                                'transcoded_key':transcoded_key,'cmd':cmd,'result_out':result.stdout,'result_err':result.stderr}),
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': True,
-                'Access-Control-Allow-Methods': "GET,POST,OPTIONS,PUT",
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-            }
-        }
 
     except Exception as e:
-        print(f"An error occurred: {e}")
-      
+        logger.error(f"An error occurred: {e}")
         return {
             'statusCode': 500,
             'body': json.dumps({'error': str(e)}),
