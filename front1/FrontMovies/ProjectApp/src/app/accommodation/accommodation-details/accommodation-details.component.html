@@ -55,7 +55,7 @@
       <mat-icon>play_arrow</mat-icon> Play Movie
     </button>
 
-    <button (click)="download()" class="action-button download-button"  style=" margin-left: 70%">
+    <button *ngIf="!isAdmin()" (click)="download()" class="action-button download-button"  style=" margin-left: 70%">
       <mat-icon>get_app</mat-icon> Download Movie
     </button>
    

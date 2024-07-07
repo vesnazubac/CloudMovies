@@ -59,6 +59,19 @@ class CloudBackMain(Stack):
         # )
 
 
+        # dv_table=dynamodb.Table(  #downloads - view table
+        #     self,'DVTable',
+        #     table_name='DVTable',
+        #     partition_key={'name': 'username', 'type': dynamodb.AttributeType.STRING},
+        #     sort_key={'name': 'timestamp', 'type': dynamodb.AttributeType.STRING},
+        # )
+
+        dv_table = dynamodb.Table.from_table_name(
+            self, 'DVTable',
+            table_name='DVTable' 
+        )
+
+
           # Kreiranje S3 bucketa
         bucket = s3.Bucket(self, "moviesbucket",
                            removal_policy=RemovalPolicy.DESTROY,  # Za razvojno okruženje, uklonite za produkciju
@@ -303,7 +316,9 @@ class CloudBackMain(Stack):
                     'USER_POOL_ID':user_pool.user_pool_id,
                     'S3_BUCKET_ARN': bucket.bucket_arn,
                     'DYNAMODB_TABLE_ARN': table.table_arn,
-                    'FEED_RECORDS_TABLE_NAME': records_table.table_name
+                    'FEED_RECORDS_TABLE_NAME': records_table.table_name,
+                    'DV_TABLE_NAME':dv_table.table_name,
+ 
                 },
                 role=lambda_role
                 
@@ -440,7 +455,18 @@ class CloudBackMain(Stack):
             []  # layers
         )
 
-        
+        post_dv_lambda_function = create_lambda_function(
+            "postDV",  # id
+            "postDV",  # name
+            "postDV.lambda_handler",  # handler
+            "postDV",  # include_dir
+            "POST",  # method
+            []  # layers
+        )
+
+
+
+
         # Kreiranje autorizatora
         authorizer = apigateway.TokenAuthorizer(
             self, "MovieAppAuthorizer",
@@ -605,6 +631,16 @@ class CloudBackMain(Stack):
         )
 
         state_machine.grant_start_execution(start_step_function_lambda)
+        
+        get_dvs_lambda_function = create_lambda_function(
+            "getUserDVS",
+            "getUserDVSFunction",
+            "getUserDVS.lambda_handler",
+            "getUserDVS",
+            "GET",
+            []
+        )
+
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
         table.grant_write_data(post_movie_lambda_function)
@@ -619,6 +655,11 @@ class CloudBackMain(Stack):
         
         records_table.grant_write_data(post_record_lambda_function)
         records_table.grant_read_data(get_records_lambda_function)
+
+        dv_table.grant_write_data(post_dv_lambda_function)
+        dv_table.grant_read_data(get_dvs_lambda_function)
+
+       
         
         send_email_lambda_function = create_lambda_function(
             "SendEmail",   # id
@@ -693,6 +734,8 @@ class CloudBackMain(Stack):
         self.api.root.add_resource("changeResolution").add_method("POST",change_resolution_integration)
         #Ova metoda kreira novi resurs movies. To znači da će URL za ovaj resurs biti /movies.
         #To znači da će se, kada API Gateway primi GET zahtev na /movies, pozvati get_movie_lambda_function.
+        
+        get_movies_integration = apigateway.LambdaIntegration(get_movie_lambda_function) #integracija izmedju lambda fje i API gateway-a, sto znaci da API Gateway može pozivati Lambda funkciju kao odgovor na HTTP zahteve. 
         self.api.root.add_resource("movies").add_method("GET", get_movies_integration) #Ova metoda dodaje novi resurs pod nazivom movies na root nivou API-ja.
 
         split_resolutions_integration = apigateway.LambdaIntegration(split_resolutions_lambda)
@@ -741,3 +784,9 @@ class CloudBackMain(Stack):
 
         get_records_integration = apigateway.LambdaIntegration(get_records_lambda_function)
         self.api.root.add_resource("getRecords").add_method("GET", get_records_integration)
+
+        post_dv_integration = apigateway.LambdaIntegration(post_dv_lambda_function)
+        self.api.root.add_resource("postDV").add_method("POST", post_dv_integration)
+
+        get_dvs_integration = apigateway.LambdaIntegration(get_dvs_lambda_function)
+        self.api.root.add_resource("getUserDVS").add_method("GET", get_dvs_integration)

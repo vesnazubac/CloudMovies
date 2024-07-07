@@ -38,7 +38,7 @@
   </div>
 </form>
 <div class="card-container">
-    <div *ngFor="let movie of moviesList" style="margin-bottom: 2%;margin-top: 1%;">
+    <div *ngFor="let movie of fetchedMovies" style="margin-bottom: 2%;margin-top: 1%;">
       <app-accommodation [movie]="movie"></app-accommodation>
     </div>
   </div>
