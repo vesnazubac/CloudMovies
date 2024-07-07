@@ -33,6 +33,7 @@ import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } fr
 import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
 import { RecordPostDTO } from './recordPost';
+import { DVPostDTO } from './dvPostDTO';
 @Component({
     selector: 'app-accommodation-details',
     templateUrl: './accommodation-details.component.html',
@@ -446,8 +447,48 @@ subscribeGenre(genre: string | undefined): void {
             console.error('Username is not set in localStorage');
             return;
           }
-          const record = new RecordPostDTO(username, 'view', 0,this.movie_id,this.movie_naslov);
-        
+
+
+            const record = new DVPostDTO(username, 'view',this.movie_id,this.movie_naslov);
+
+        console.log(record);
+
+        this.http.post<any>(`${environment.cloudHost}postDV`, record, {
+          headers: new HttpHeaders({
+            'Content-Type': 'application/json'
+          })
+        }).subscribe(
+          response => {
+            console.log('Zapis uspesno dodat:', response);
+          
+          },
+          error => {
+            console.error('Greška prilikom ubacivanja zapisa:', error);
+          
+          }
+        );
+
+
+         
+
+        //   const record = new RecordPostDTO(username, 'view', 1,this.movie_id,this.movie_naslov);
+
+        // console.log(record);
+
+        // this.http.post<any>(`${environment.cloudHost}postRecord`, record, {
+        //   headers: new HttpHeaders({
+        //     'Content-Type': 'application/json'
+        //   })
+        // }).subscribe(
+        //   response => {
+        //     console.log('Zapis uspesno dodat:', response);
+          
+        //   },
+        //   error => {
+        //     console.error('Greška prilikom ubacivanja zapisa:', error);
+          
+        //   }
+        // );
 
 
           } else {
@@ -464,12 +505,6 @@ subscribeGenre(genre: string | undefined): void {
 
 
   }
-
-
-  // download():Observable<Blob>{
-  //   return this.http.get(this.s3Url,{responseType:'blob'});
-  // }
-
 
   download() {
     console.log("S3URL : ", this.s3Url);
@@ -512,12 +547,44 @@ subscribeGenre(genre: string | undefined): void {
           console.error('Username is not set in localStorage');
           return;
         }
-        const record = new RecordPostDTO(username, 'download', 0,this.movie_id,this.movie_naslov);
-      
 
-      
-      
-      
+
+        const record = new DVPostDTO(username, 'download',this.movie_id,this.movie_naslov);
+
+        console.log(record);
+
+        this.http.post<any>(`${environment.cloudHost}postDV`, record, {
+          headers: new HttpHeaders({
+            'Content-Type': 'application/json'
+          })
+        }).subscribe(
+          response => {
+            console.log('Zapis uspesno dodat:', response);
+          
+          },
+          error => {
+            console.error('Greška prilikom ubacivanja zapisa:', error);
+          
+          }
+        );
+        // const record = new RecordPostDTO(username, 'download', 1,this.movie_id,this.movie_naslov);
+
+        // console.log(record);
+
+        // this.http.post<any>(`${environment.cloudHost}postRecord`, record, {
+        //   headers: new HttpHeaders({
+        //     'Content-Type': 'application/json'
+        //   })
+        // }).subscribe(
+        //   response => {
+        //     console.log('Zapis uspesno dodat:', response);
+          
+        //   },
+        //   error => {
+        //     console.error('Greška prilikom ubacivanja zapisa:', error);
+          
+        //   }
+        // );
       },
       (error: HttpErrorResponse) => {
         // Obradite greške
@@ -621,15 +688,15 @@ subscribeGenre(genre: string | undefined): void {
         // Prosečna ocena
         this.averageRating = count > 0 ? sum / count : 0;
         console.log('Prosečna ocena filma:', this.averageRating);
-
-       
-        
       },
       error => {
         console.error('Greška prilikom dohvatanja zapisa:', error);
       }
     );
   }
+
+
+  
 
 }
 

@@ -36,6 +36,61 @@ def lambda_handler(event, context):
                 }
             )
 
+    elif type == 'download':
+        response = table.query(
+            KeyConditionExpression=Key('id_filma').eq(id_filma) & 
+                                Key('username').eq(username)
+        )
+
+        # Ako postoji takav zapis, uvećaj content za 1
+        for item in response['Items']:
+            table.update_item(
+                Key={
+                    'id_filma': item['id_filma'],
+                    'username': item['username']
+                },
+                UpdateExpression='SET content = content + :inc',
+                ExpressionAttributeValues={
+                    ':inc': 1
+                }
+            )
+            return {
+                'statusCode': 200,
+                'body': json.dumps({'message': 'Content updated successfully!'}),
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True,
+                }
+            }
+    elif type == 'view':
+        response = table.query(
+            KeyConditionExpression=Key('id_filma').eq(id_filma) & 
+                                Key('username').eq(username)
+        )
+
+        # Ako postoji takav zapis, uvećaj content za 1
+        for item in response['Items']:
+            if(item['type']=='view'):
+                table.update_item(
+                    Key={
+                        'id_filma': item['id_filma'],
+                        'username': item['username']
+                    },
+                    UpdateExpression='SET content = content + :inc',
+                    ExpressionAttributeValues={
+                        ':inc': 1
+                    }
+                )
+                return {
+                    'statusCode': 200,
+                    'body': json.dumps({'message': 'Content updated successfully!'}),
+                    'headers': {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Credentials': True,
+                    }
+                }
+               
+
     item = {
         'username': username,
         'type': type,
