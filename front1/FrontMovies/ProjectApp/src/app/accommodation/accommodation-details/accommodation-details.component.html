@@ -40,6 +40,17 @@
       <button mat-button style="margin-left: 20px;" (click)="submitRating()">Submit Rating</button>
     </div>
 
+    <div style="margin-top: 20px; margin-left: 2%;">
+      <h3><strong>Pick movie resolution</strong></h3>
+      <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedResolution">
+        <mat-radio-button value="/480p.mp4">480</mat-radio-button>
+        <mat-radio-button value="/720p.mp4" style="margin-left: 10px;">720</mat-radio-button>
+        <mat-radio-button value="/1080p.mp4" style="margin-left: 10px;">1080</mat-radio-button>
+        <mat-radio-button value="" style="margin-left: 10px;">Original</mat-radio-button>
+      </mat-radio-group>
+      <button mat-button style="margin-left: 20px;" (click)="checkResolution()">Check resolution</button>
+    </div>
+
     <button (click)="play()" class="action-button play-button" style=" margin-left: 70%;margin-top: 20%;">
       <mat-icon>play_arrow</mat-icon> Play Movie
     </button>
