@@ -49,7 +49,7 @@ export class CreateMovieComponent {
   @ViewChildren('episodeFileInput') episodeFileInputs!: QueryList<any>;
 
   images:string[]=[]
-
+  postedFileUrl=""
   accessToken: any = localStorage.getItem('user');
   helper = new JwtHelperService();
   decodedToken = this.helper.decodeToken(this.accessToken);
@@ -191,7 +191,6 @@ export class CreateMovieComponent {
     };
 
     console.log(movieData);
-
     this.http
       .post(environment.cloudHost + 'postMovies', JSON.stringify(movieData), {
         headers: new HttpHeaders({
@@ -199,15 +198,61 @@ export class CreateMovieComponent {
         }),
       })
       .subscribe(
-        (response) => {
+        (response: any) => {
           console.log(response);
+          this.postedFileUrl = response.video_url.split('/').slice(-1)[0]
           this.openSnackBar('Movie posted successfully.');
+          console.log("UNUTAR SUBA"+this.postedFileUrl)
+
+          var sendData={
+            "id_filma":this.postedFileUrl,
+            "target_resolutions":[720,480,360],
+            "file_type":"mp4",
+            "file_name":this.postedFileUrl
+          }
+          this.http
+          .post(environment.cloudHost + 'sendTranscodingMessage', JSON.stringify(sendData), {
+          headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+          }),
+          })
+          .subscribe(
+            (response: any) => {
+            console.log(response);
+            this.openSnackBar('Message sent successfully.');
+
+          for(var i=0;i<3;i++){
+            this.http
+            .post(environment.cloudHost + 'changeResolution', {
+            headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+           }),
+            })
+            .subscribe(
+              (response: any) => {
+              console.log(response);
+              this.openSnackBar('Resolution posted successfully.');
+              },
+            (error) => {
+              console.error(error);
+              this.openSnackBar('An error occured while changing resolution!');
+              }
+          );
+
+        }//kraj fora
+          },
+          (error) => {
+            console.error(error);
+            this.openSnackBar('An error occured while sending message to sqs!');
+          }
+      );
         },
         (error) => {
           console.error(error);
           this.openSnackBar('An error occured while posting movie!');
         }
       );
+      //"https://cloudbackmain-moviesbucket19abdbbf-irgfkwd1p9ah.s3.eu-central-1.amazonaws.com/4fe25017-78cb-4a59-992b-51df71fa1054.mp4"
   }
 
   async registerSeries() {
