@@ -14,7 +14,8 @@ from aws_cdk import (
     aws_cognito as cognito,
     aws_sns as sns,
     aws_sns_subscriptions as subs,
-    aws_lambda_event_sources as lambda_event_sources
+    aws_lambda_event_sources as lambda_event_sources,
+    aws_stepfunctions as sfn
 )
 from constructs import Construct
 from aws_cdk.aws_lambda import LayerVersion 
@@ -287,12 +288,14 @@ class CloudBackMain(Stack):
             function = _lambda.Function(
                 self, id,
                 function_name=name,
+
+
                 runtime=_lambda.Runtime.PYTHON_3_9,
                 layers=layers,
                 handler=handler,
                 code=_lambda.Code.from_asset(include_dir),
                 memory_size=128,
-                timeout=Duration.seconds(10),
+                timeout=Duration.seconds(10),     
                 environment={
                     'TABLE_NAME': table.table_name,
                     'SEARCH_TABLE_NAME': search_table.table_name,
@@ -301,7 +304,6 @@ class CloudBackMain(Stack):
                     'S3_BUCKET_ARN': bucket.bucket_arn,
                     'DYNAMODB_TABLE_ARN': table.table_arn,
                     'FEED_RECORDS_TABLE_NAME': records_table.table_name
- 
                 },
                 role=lambda_role
                 
@@ -438,80 +440,6 @@ class CloudBackMain(Stack):
             []  # layers
         )
 
-        # split_resolutions_lambda = _lambda.Function(
-        #     self, "splitResolutionsFunction",
-        #     handler="split_resolutions.lambda_handler",
-        #     layers=[]
-        # )
-
-        # split_task = tasks.LambdaInvoke(
-        #     self, "SplitResolutions",
-        #     lambda_function=split_resolutions_lambda,
-        #     output_path="$.Payload"
-        # )
-        # transcode_720p_task = tasks.LambdaInvoke(
-        #     self, "TranscodeAndUpload720p",
-        #     lambda_function=change_resolution_lambda_function,
-        #     payload=sfn.TaskInput.from_object({
-        #         "original_key": sfn.JsonPath.string_at("$.original_key"),
-        #         "target_resolution": 720
-        #     }),
-        #     result_path="$.transcode720p"
-        # ).add_retry(
-        #     max_attempts=3,
-        #     interval=Duration.seconds(5)
-        # )
-
-        # transcode_480p_task = tasks.LambdaInvoke(
-        #     self, "TranscodeAndUpload480p",
-        #     lambda_function=change_resolution_lambda_function,
-        #     payload=sfn.TaskInput.from_object({
-        #         "original_key": sfn.JsonPath.string_at("$.original_key"),
-        #         "target_resolution": 480
-        #     }),
-        #     result_path="$.transcode480p"
-        # ).add_retry(
-        #     max_attempts=3,
-        #     interval=Duration.seconds(5)
-        # )
-
-        # transcode_360p_task = tasks.LambdaInvoke(
-        #     self, "TranscodeAndUpload360p",
-        #     lambda_function=change_resolution_lambda_function,
-        #     payload=sfn.TaskInput.from_object({
-        #         "original_key": sfn.JsonPath.string_at("$.original_key"),
-        #         "target_resolution": 360
-        #     }),
-        #     result_path="$.transcode360p"
-        # ).add_retry(
-        #     max_attempts=3,
-        #     interval=Duration.seconds(5)
-        # )
-        # parallel_transcode = sfn.Parallel(self, "ParallelTranscode")
-        # parallel_transcode.branch(transcode_720p_task)
-        # parallel_transcode.branch(transcode_480p_task)
-        # parallel_transcode.branch(transcode_360p_task)
-
-        # definition = split_task.next(parallel_transcode)
-
-        # state_machine = sfn.StateMachine(
-        #     self, "VideoProcessingStateMachine",
-        #     definition_body=sfn.DefinitionBody.from_chainable(definition),
-        #     timeout=Duration.minutes(10)
-        # )
-
-        # start_step_function_lambda = _lambda.Function(
-        #     self, "StartSplittingResolutionsFunctionExecution",
-        #     runtime=_lambda.Runtime.PYTHON_3_12,
-        #     handler="startSplittingResolutions/start_splitting_resolutions.handler",
-        #     memory_size=128,
-        #     timeout=Duration.seconds(10),
-        #     environment={
-        #         "STATE_MACHINE_ARN": state_machine.state_machine_arn
-        #     }
-        # )
-        # state_machine.grant_start_execution(start_step_function_lambda)
-
         
         # Kreiranje autorizatora
         authorizer = apigateway.TokenAuthorizer(
@@ -597,6 +525,86 @@ class CloudBackMain(Stack):
             )
         )
 
+        split_resolutions_lambda = create_lambda_function(
+            "splitResolutions",
+            "splitResolutionsFunction",
+            "splitResolutions.lambda_handler",
+            "splitResolutions",
+            "POST",
+            []
+        )
+
+        split_task = tasks.LambdaInvoke(
+            self, "splitResolutions1",
+            lambda_function=split_resolutions_lambda,
+            output_path="$.Payload"
+        )
+
+        transcode_720p_task = tasks.LambdaInvoke(
+            self, "TranscodeAndUpload720p",
+            lambda_function=change_resolution_lambda_function,
+            payload=sfn.TaskInput.from_object({
+                #"original_key": sfn.JsonPath.string_at("$.original_key"), #
+                "target_resolution": 720
+            }),
+            result_path="$.transcode720p" #
+        ).add_retry(
+            max_attempts=3,
+            interval=Duration.seconds(5)
+        )
+
+        transcode_480p_task = tasks.LambdaInvoke(
+            self, "TranscodeAndUpload480p",
+            lambda_function=change_resolution_lambda_function,
+            payload=sfn.TaskInput.from_object({
+                #"original_key": sfn.JsonPath.string_at("$.original_key"), #
+                "target_resolution": 480
+            }),
+            result_path="$.transcode480p" #
+        ).add_retry(
+            max_attempts=3,
+            interval=Duration.seconds(5)
+        )
+
+        transcode_360p_task = tasks.LambdaInvoke(
+            self, "TranscodeAndUpload360p",
+            lambda_function=change_resolution_lambda_function,
+            payload=sfn.TaskInput.from_object({
+                #"original_key": sfn.JsonPath.string_at("$.original_key"), ####
+                "target_resolution": 360
+            }),
+            result_path="$.transcode360p" ####
+        ).add_retry(
+            max_attempts=3,
+            interval=Duration.seconds(5)
+        )
+
+        parallel_transcode = sfn.Parallel(self, "ParallelTranscode")
+        parallel_transcode.branch(transcode_720p_task)
+        parallel_transcode.branch(transcode_480p_task)
+        parallel_transcode.branch(transcode_360p_task)
+
+        definition = split_task.next(parallel_transcode)
+
+        state_machine = sfn.StateMachine(
+            self, "VideoProcessingStateMachine",
+            definition_body=sfn.DefinitionBody.from_chainable(definition),
+            timeout=Duration.minutes(10)
+        )
+
+        start_step_function_lambda = _lambda.Function(
+            self, "StartSplittingResolutionsFunction",
+            runtime=_lambda.Runtime.PYTHON_3_9,
+            handler="startSplittingResolutions.lambda_handler",
+            code=_lambda.Code.from_asset("startSplittingResolutions"),
+            memory_size=128,
+            timeout=Duration.seconds(10),
+            environment={
+                "STATE_MACHINE_ARN": state_machine.state_machine_arn
+            }
+        )
+
+        state_machine.grant_start_execution(start_step_function_lambda)
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
         table.grant_write_data(post_movie_lambda_function)
@@ -687,27 +695,14 @@ class CloudBackMain(Stack):
         #To znači da će se, kada API Gateway primi GET zahtev na /movies, pozvati get_movie_lambda_function.
         self.api.root.add_resource("movies").add_method("GET", get_movies_integration) #Ova metoda dodaje novi resurs pod nazivom movies na root nivou API-ja.
 
+        split_resolutions_integration = apigateway.LambdaIntegration(split_resolutions_lambda)
+        self.api.root.add_resource("splitResolutions").add_method("POST",split_resolutions_integration)
 
         delete_movie_integration = apigateway.LambdaIntegration(delete_movie_lambda_function)
         self.api.root.add_resource("deleteMovie").add_method("DELETE", delete_movie_integration, authorizer=authorizer)
 
         put_movie_integration = apigateway.LambdaIntegration(put_movie_lambda_function)
         self.api.root.add_resource("putMovie").add_method("PUT",put_movie_integration, authorizer=authorizer)
-        #self.api.root.add_resource("searchMovies").add_method("GET", search_movies_integration)
-        #self.api.root("movies").add_method("POST", post_movies_integration)
-           # Assume the movies resource already exists
-        # moviesResource = self.api.root.get_resource("movies")
-        # if moviesResource is None:
-        #     # If not exists, create it (remove this part if you are sure it exists)
-        #     moviesResource = self.api.root.add_resource("movies")
-
-        # # Add POST method to the existing movies resource
-        # moviesResource.add_method("POST", post_movies_integration)
-        # transcode_resource = self.api.root.add_resource("transcode")
-        # transcode_resource.add_method("PUT", apigateway.LambdaIntegration(start_step_function_lambda),
-        #                           authorization_type=apigateway.AuthorizationType.COGNITO,
-        #                           authorizer=authorizer,
-        #                           )
  
         self.api.root.add_resource("postMovies").add_method("POST", post_movies_integration,authorizer=authorizer)
 

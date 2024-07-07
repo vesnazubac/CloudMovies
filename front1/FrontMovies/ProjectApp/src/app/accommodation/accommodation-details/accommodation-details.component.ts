@@ -53,7 +53,7 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
 
   movie_id:string;
   movie_naslov:string;
-
+  selectedResolution:string
   averageRating:number=0;
 
 
@@ -70,7 +70,9 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
     private userService:UserService,
     private snackBar:MatSnackBar,
     private http:HttpClient
-  ){}
+  ){
+    this.selectedResolution=""
+  }
   ngAfterViewInit(): void {
     this.cdr.detectChanges();
   }
@@ -119,7 +121,9 @@ export class AccommodationDetailsComponent implements OnInit,AfterViewInit{
       );
     });
   }
-
+  checkResolution(){
+    console.log(this.selectedResolution)
+  }
 subscribeActor(actor:string){
 
   const username = localStorage.getItem('username'); // Dohvati korisničko ime iz Local Storage-a
@@ -368,6 +372,8 @@ subscribeGenre(genre: string | undefined): void {
         const movieWithS3Url = movies.find((m) => m.id_filma === this.movie.id_filma);
         if (movieWithS3Url && movieWithS3Url.s3_url) {
           const s3Url = movieWithS3Url.s3_url.trim();
+          const resolution = this.selectedResolution
+          console.log(resolution)
           if (s3Url !== '') {
             console.log("S3 URL JE ", s3Url);
   
@@ -377,7 +383,7 @@ subscribeGenre(genre: string | undefined): void {
               <div class="modal">
                 <div class="modal-content">
                   <span class="close-button">&times;</span>
-                  <iframe src="${s3Url}" frameborder="0"></iframe>
+                  <iframe src="${s3Url}${resolution}" frameborder="0"></iframe>
                 </div>
               </div>
             `;
@@ -484,9 +490,9 @@ subscribeGenre(genre: string | undefined): void {
     //  headers: new HttpHeaders().set('Authorization', '')
       headers
     };
-  
+    const resolution=this.selectedResolution
     // Pošaljite HTTP GET zahtev
-    this.http.get(this.s3Url, options).subscribe(
+    this.http.get(this.s3Url+resolution, options).subscribe(
       (response: any) => {
         const blob = new Blob([response], { type: 'video/' + this._response.movie_data.file_type });
   
