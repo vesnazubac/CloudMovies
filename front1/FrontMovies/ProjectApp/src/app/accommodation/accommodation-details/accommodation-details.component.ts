@@ -292,7 +292,48 @@ subscribeGenre(genre: string | undefined): void {
         (response: any) => {
           console.log('Edit response:', response);
           this.openSnackBar('Film uspešno izmenjen.');
-          
+          var sendData={
+            "id_filma":this.id+"."+movieData.file_type,
+            "target_resolutions":[720,480,360],
+            "file_type":movieData.file_type,
+            "file_name":this.id+"."+movieData.file_type
+          }
+          this.http
+              .post(environment.cloudHost + 'sendTranscodingMessage', JSON.stringify(sendData), {
+              headers: new HttpHeaders({
+              'Content-Type': 'application/json',
+              }),
+              })
+              .subscribe(
+                (response: any) => {
+                console.log(response);
+                this.openSnackBar('Message sent successfully.');
+    
+              for(var i=0;i<3;i++){
+                this.http
+                .post(environment.cloudHost + 'changeResolution', {
+                headers: new HttpHeaders({
+                'Content-Type': 'application/json',
+               }),
+                })
+                .subscribe(
+                  (response: any) => {
+                  console.log(response);
+                  this.openSnackBar('Resolution posted successfully.');
+                  },
+                (error) => {
+                  console.error(error);
+                  this.openSnackBar('An error occured while changing resolution!');
+                  }
+              );
+    
+            }//kraj fora
+              },
+              (error) => {
+                console.error(error);
+                this.openSnackBar('An error occured while sending message to sqs!');
+              }
+          );
         },
         (error: any) => {
           console.error('Error editing movie:', error);
@@ -300,48 +341,7 @@ subscribeGenre(genre: string | undefined): void {
         }
       );
 
-      var sendData={
-        "id_filma":this.id+"."+file.type.split('/')[1],
-        "target_resolutions":[720,480,360],
-        "file_type":file.type.split('/')[1],
-        "file_name":this.id+"."+file.type.split('/')[1]
-      }
-      this.http
-          .post(environment.cloudHost + 'sendTranscodingMessage', JSON.stringify(sendData), {
-          headers: new HttpHeaders({
-          'Content-Type': 'application/json',
-          }),
-          })
-          .subscribe(
-            (response: any) => {
-            console.log(response);
-            this.openSnackBar('Message sent successfully.');
-
-          for(var i=0;i<3;i++){
-            this.http
-            .post(environment.cloudHost + 'changeResolution', {
-            headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-           }),
-            })
-            .subscribe(
-              (response: any) => {
-              console.log(response);
-              this.openSnackBar('Resolution posted successfully.');
-              },
-            (error) => {
-              console.error(error);
-              this.openSnackBar('An error occured while changing resolution!');
-              }
-          );
-
-        }//kraj fora
-          },
-          (error) => {
-            console.error(error);
-            this.openSnackBar('An error occured while sending message to sqs!');
-          }
-      );
+      
     }
 
     else{
