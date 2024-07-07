@@ -32,17 +32,7 @@ def lambda_handler(event, context):
         480: 720,
         360: 480
         }
-        # s3_source_key = 'input.mp3' # Update your s3 object file name here
-
-        # s3_resource.Bucket(bucket_name).download_file(id_filma, download_path)
-    
-        # print('Audio File Info')
-        # subprocess.call(['ffmpeg', '-i', f'/tmp/{id_filma}'])
-    
-        # return {
-        #     'statusCode': 200,
-        #     'body': json.dumps('FFMPEG File Info Fetched')
-        # }
+        
         if target_resolution not in resolutions:
             resolution = [-1, target_resolution]
         else:

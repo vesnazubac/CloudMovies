@@ -6,14 +6,15 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_dynamodb as dynamodb,
     aws_iam as iam, BundlingOptions, Duration,
-    # aws_sqs as sqs,
+    aws_sqs as sqs,
     aws_dynamodb as dynamodb,
     aws_stepfunctions as sfn,
     aws_stepfunctions_tasks as tasks,
     aws_s3 as s3,
     aws_cognito as cognito,
     aws_sns as sns,
-    aws_sns_subscriptions as subs
+    aws_sns_subscriptions as subs,
+    aws_lambda_event_sources as lambda_event_sources
 )
 from constructs import Construct
 from aws_cdk.aws_lambda import LayerVersion 
@@ -144,7 +145,8 @@ class CloudBackMain(Stack):
                     "dynamodb:Query",
                     "dynamodb:Scan",
                     "s3:GetObject",
-                    "s3:ListBucket"
+                    "s3:ListBucket",
+                    "sqs:sendMessage"
                 ],
                 resources=[
                     table.table_arn,
@@ -182,7 +184,8 @@ class CloudBackMain(Stack):
                 "iam:ListRolePolicies",
                 "iam:GetRolePolicy",
                  "sns:Subscribe",
-                "sns:ListSubscriptionsByTopic"
+                "sns:ListSubscriptionsByTopic",
+                "sqs:SendMessage"
                 ],
                 resources=[
                     table.table_arn,
@@ -261,7 +264,8 @@ class CloudBackMain(Stack):
                     "cognito-idp:AdminAddUserToGroup",
                     "cognito-idp:AdminListGroupsForUser",
                     "iam:GetRolePolicy",
-                    "sns:GetTopicAttributes"
+                    "sns:GetTopicAttributes",
+                    "sqs:SendMessage"
                 ],
                 # resources=[table.table_arn]
                  resources=[
@@ -329,6 +333,14 @@ class CloudBackMain(Stack):
             "changeResolution",
             "POST", # valjda je POST nzm
             layers=[]#[ _lambda.LayerVersion.from_layer_version_arn(self, 'ffmpeg','arn:aws:lambda:eu-central-1:590183980405:layer:ffmpeg:1'),]
+        )
+        send_transcoding_message_lambda_function = create_lambda_function(
+            "sendTranscodingMessage",
+            "sendTranscodingMessageFunction",
+            "sendTranscodingMessage.lambda_handler",
+            "sendTranscodingMessage",
+            "POST",
+            []
         )
         util_layer = LayerVersion(
             self, 'UtilLambdaLayer',
@@ -573,6 +585,18 @@ class CloudBackMain(Stack):
             []
         )
 
+        transcoding_queue = sqs.Queue(self, "MyQueue",
+                                      visibility_timeout=Duration.seconds(300),
+                                      retention_period=Duration.days(7),
+                                      encryption=None)
+        
+        send_transcoding_message_lambda_function.add_event_source(
+            lambda_event_sources.SqsEventSource(
+                queue=transcoding_queue,
+                batch_size=1
+            )
+        )
+
         # Dodavanje dozvola Lambda funkciji za pristup DynamoDB tabeli
         table.grant_read_data(get_movie_lambda_function)
         table.grant_write_data(post_movie_lambda_function)
@@ -690,6 +714,9 @@ class CloudBackMain(Stack):
 
         self.api.root.add_resource("getMovie").add_method("GET", get_movie_by_id_integration)
         self.api.root.add_resource("searchMovies").add_method("GET", search_movies_integration)
+
+        send_transcoding_message_integration = apigateway.LambdaIntegration(send_transcoding_message_lambda_function)
+        self.api.root.add_resource("sendTranscodingMessage").add_method("POST",send_transcoding_message_integration)
 
         send_email_integration = apigateway.LambdaIntegration(send_email_lambda_function)
         self.api.root.add_resource("sendEmail").add_method("POST", send_email_integration)
