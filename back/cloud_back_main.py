@@ -307,8 +307,8 @@ class CloudBackMain(Stack):
                 layers=layers,
                 handler=handler,
                 code=_lambda.Code.from_asset(include_dir),
-                memory_size=128,
-                timeout=Duration.seconds(10),     
+                memory_size=512,
+                timeout=Duration.seconds(60),     
                 environment={
                     'TABLE_NAME': table.table_name,
                     'SEARCH_TABLE_NAME': search_table.table_name,
