@@ -63,7 +63,7 @@ def lambda_handler(event, context):
                 # Upload transcoded video to S3
                 transcoded_key = f'{output_prefix}{resolutions[target_resolution]}.{file_type}'
                 with open(output_path, "rb") as f:
-                    s3_client.put_object(Bucket=bucket_name, Key=transcoded_key, Body=f)
+                    s3_client.put_object(Bucket=bucket_name, Key=transcoded_key, Body=f,ContentType=f'video/{file_type}')
                     logger.info(f"Transcoded video uploaded to S3: {transcoded_key}")
 
                 # Clean up temporary files
