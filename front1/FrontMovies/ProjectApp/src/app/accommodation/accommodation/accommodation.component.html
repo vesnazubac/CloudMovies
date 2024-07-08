@@ -10,7 +10,11 @@
     <p class="movie-actors">Actors: {{movie.glumci}}</p>
     <p>Genre: {{movie.zanr}}</p>
     <br>
-    <button [routerLink]="['/accommodations', movie.id_filma , movie.naslov]">Show details</button>
+    <button *ngIf="!movie.episode" [routerLink]="['/accommodations', movie.id_filma , movie.naslov]">Show details</button>
+    <!--<button [routerLink]="['/accommodations', movie.id_filma , movie.naslov]">Show details</button>-->
+    <div *ngFor="let movieItem of moviesList">
+      <button *ngIf="movieItem.episode" [routerLink]="['/accommodations', movieItem.id_filma , movieItem.naslov]">Episode:{{movieItem.episode}}</button>
+    </div>
   </mat-card-content>
 </mat-card>
   

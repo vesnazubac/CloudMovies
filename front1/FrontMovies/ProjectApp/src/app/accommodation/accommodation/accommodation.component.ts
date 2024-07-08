@@ -2,6 +2,8 @@ import { Component, Input } from '@angular/core';
 import { Accommodation } from './model/accommodation.model';
 import { MovieGetDTO } from 'src/app/models/movieGetDTO.model';
 import { UserService } from 'src/app/user.service';
+import { HttpParams, HttpClient } from '@angular/common/http';
+import { environment } from 'src/env/env';
 
 
 @Component({
@@ -19,33 +21,50 @@ export class AccommodationComponent {
     }
     return description;
   }
+  moviesList: MovieGetDTO[] = []
+  constructor(private userService: UserService, private http:HttpClient) {}
+  ngOnInit():void{
+    if(this.movie.episode){
+      let params = new HttpParams()
+      .set('naslov', this.movie.naslov ?? '')
+      .set('opis', this.movie.opis ?? '')
+      .set('reziser',this.movie.reziser ?? '')
+      .set('glumci',this.movie.glumci ?? '');
+      console.log(params)
 
-  constructor(private userService: UserService) {}
+      const url = `${environment.cloudHost}searchMovies`;
+      
+      this.http.get(url, { params }).subscribe({
+        next: (data: any) => {
+          console.log('Rezultati pretrage:', data);
 
-  // showMovieContent() {
-  //   // Fetch movie details including S3 URL from the server if needed
-  //   this.userService.getAllMovies().subscribe(
-  //     (movies: MovieGetDTO[]) => {
-  //       const movieWithS3Url = movies.find((m) => m.id_filma === this.movie.id_filma);
-  //       if (movieWithS3Url && movieWithS3Url.s3_url) {
-  //         console.log("USAO 30 LINIJA ")
-  //         const s3Url = movieWithS3Url.s3_url.trim();
-  //         if (s3Url !== '') {
-  //           console.log("S3 URL JE ",s3Url);
-  //           //window.open(s3Url, '_blank'); // Opens the S3 content in a new tab or window
-  //           window.location.href = s3Url;
-  //         } else {
-  //           console.error(`Invalid S3 URL for movie with id ${this.movie.id_filma}`);
-  //         }
-  //       } else {
-  //         console.error(`Movie with id ${this.movie.id_filma} not found in the list or missing S3 URL.`);
-  //       }
-  //     },
-  //     (error) => {
-  //       console.error('Error fetching movies:', error);
-  //     }
-  //   );
-  // }
+          const uniqueMoviesList: MovieGetDTO[] = [];
+
+          data.forEach((item: any) => {
+              uniqueMoviesList.push({
+                id_filma: item.id_filma,
+                rezolucija: item.rezolucija,
+                zanr: item.zanr,
+                trajanje: item.trajanje,
+                naslov: item.naslov,
+                opis: item.opis,
+                reziser: item.reziser,
+                glumci: item.glumci,
+                s3_url:item.s3_url,
+                episode:item.episode
+              });
+          });
+  
+          this.moviesList = uniqueMoviesList;
+          console.log('Converted SERIES:', this.moviesList);
+        },
+        error: (error) => {
+          console.error('Greška pri dohvatanju podataka:', error);
+          // Prikazivanje snackbar poruke u slučaju greške
+        }
+      });
+    }
+  }
   showMovieContent() {
     // Fetch movie details including S3 URL from the server if needed
     this.userService.getAllMovies().subscribe(

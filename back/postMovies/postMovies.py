@@ -18,7 +18,7 @@ def lambda_handler(event, context):
     try:
         # Load request body
         body = json.loads(event['body'])
-        
+        episode=""
         # Extract movie data
         id_filma = str(uuid.uuid4())
         naslov = body.get('naslov')
@@ -31,7 +31,7 @@ def lambda_handler(event, context):
         file_name = body.get('file_name')
         file_size = body.get('file_size')
         file_modified = body.get('file_modified')
-        episode = body.get('episode')
+        episode = str(body.get('episode'))
 
         # Validate required fields
         if not id_filma or not naslov or not video_data:
@@ -78,7 +78,7 @@ def lambda_handler(event, context):
                 'file_size': file_size,
                 'file_modified': file_modified,
                 's3_url': s3_url,  # Dodajemo novi atribut s3_url
-                'episode':episode
+                'episode':str(episode)
 
             }
         )
