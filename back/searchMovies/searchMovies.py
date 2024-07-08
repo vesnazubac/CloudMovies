@@ -33,6 +33,10 @@ def lambda_handler(event, context):
                 KeyConditionExpression=Key('combined_key').eq(combined_key)
             )
             items = response.get('Items', [])
+            for item in items:
+                for key, value in item.items():
+                    if isinstance(value, Decimal):
+                        item[key] = float(value)  # Convert Decimal to float
         else:
             # Perform scan with FilterExpression
             filter_expression = None
