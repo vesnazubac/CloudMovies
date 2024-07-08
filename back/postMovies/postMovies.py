@@ -36,7 +36,17 @@ def lambda_handler(event, context):
         # Validate required fields
         if not id_filma or not naslov or not video_data:
             raise ValueError("Missing required fields")
-        
+        if file_type not in ["mp4","gif","mov","m4p","mpg"]:
+            return {
+            'statusCode': 500,
+            'body': json.dumps({'message': 'Wrong file format'}),
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Access-Control-Allow-Methods': "GET,POST,OPTIONS,PUT",
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+            }
+            }
         # S3: Upload video file
         bucket_name = os.environ['BUCKET_NAME']
         video_binary = base64.b64decode(video_data)

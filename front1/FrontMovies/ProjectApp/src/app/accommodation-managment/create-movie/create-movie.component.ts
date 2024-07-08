@@ -303,23 +303,66 @@ export class CreateMovieComponent {
       console.log(`File Modified: ${seriesData.file_modified}`);
       console.log('Pozivam servis')
       this.http
-        .post(environment.cloudHost + 'postMovies', JSON.stringify(seriesData), {
+      .post(environment.cloudHost + 'postMovies', JSON.stringify(seriesData), {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json',
+        }),
+      })
+      .subscribe(
+        (response: any) => {
+          console.log(response);
+          this.postedFileUrl = response.video_url.split('/').slice(-1)[0]
+          this.openSnackBar('Movie posted successfully.');
+          console.log("UNUTAR SUBA"+this.postedFileUrl)
+
+          var sendData={
+            "id_filma":this.postedFileUrl,
+            "target_resolutions":[720,480,360],
+            "file_type":"mp4",
+            "file_name":this.postedFileUrl
+          }
+          this.http
+          .post(environment.cloudHost + 'sendTranscodingMessage', JSON.stringify(sendData), {
           headers: new HttpHeaders({
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
           }),
-        })
-        .subscribe(
-          (response) => {
+          })
+          .subscribe(
+            (response: any) => {
             console.log(response);
-            if (i === episodeCount - 1) {
-              this.openSnackBar('Series posted successfully.');
-            }
+            this.openSnackBar('Message sent successfully.');
+
+          for(var i=0;i<3;i++){
+            this.http
+            .post(environment.cloudHost + 'changeResolution', {
+            headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+           }),
+            })
+            .subscribe(
+              (response: any) => {
+              console.log(response);
+              this.openSnackBar('Resolution posted successfully.');
+              },
+            (error) => {
+              console.error(error);
+              this.openSnackBar('An error occured while changing resolution!');
+              }
+          );
+
+        }//kraj fora
           },
           (error) => {
             console.error(error);
-            this.openSnackBar(`An error occurred while posting episode ${i + 1}.`);
+            this.openSnackBar('An error occured while sending message to sqs!');
           }
-        );
+      );
+        },
+        (error) => {
+          console.error(error);
+          this.openSnackBar('An error occured while posting movie!');
+        }
+      );
     }
   }
   }
